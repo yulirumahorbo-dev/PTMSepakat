@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Generate Screen",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "New-Item -ItemType Directory -Force src/screens/${input:screenName}; New-Item -ItemType Directory -Force src/screens/${input:screenName}/components; New-Item -ItemType File -Force src/screens/${input:screenName}/index.js"
+      ],
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "screenName",
+      "type": "promptString",
+      "description": "Enter Screen Name"
+    }
+  ]
+}
