@@ -1,27 +1,42 @@
-import { scale } from "react-native-size-matters";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { Pressable, Text } from "react-native";
+import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { ScreenLayout } from "../../components";
-import { Text, StyleSheet } from "react-native";
+import { GlobalStyles } from "../../constants/styles";
 
-export default function Home() {
+export default function Home({ navigation }) {
   return (
     <ScreenLayout
       backgroundColor="white"
       paddingHorizontal={scale(16)}
       headerShown
     >
-      <Text>Home</Text>
+      <Pressable
+        onPress={() => navigation.navigate("Kalkulator")}
+        style={({ pressed }) => [
+          {
+            width: moderateScale(150),
+            opacity: pressed ? 0.75 : 1,
+            alignItems: "center",
+          },
+        ]}
+      >
+        <MaterialCommunityIcons
+          name="calculator-variant"
+          size={moderateScale(150)}
+          color={GlobalStyles.color.ACCENT}
+        />
+        <Text
+          style={{
+            marginTop: verticalScale(-12),
+            fontSize: moderateScale(18),
+            fontWeight: "800",
+            color: GlobalStyles.color.TEXT,
+          }}
+        >
+          KALKULATOR
+        </Text>
+      </Pressable>
     </ScreenLayout>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "white",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-});
