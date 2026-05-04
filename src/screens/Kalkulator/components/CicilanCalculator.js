@@ -1,22 +1,12 @@
-import React, { useState, version } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Pressable,
-} from "react-native";
-import { formatInputDisplay, formatRupiah } from "../../../utils/rupiah";
-import { GlobalStyles } from "../../../constants/styles";
-import Header from "./Header";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { Input } from "../../../components";
+import { GlobalStyles } from "../../../constants/styles";
+import { formatInputDisplay, formatRupiah } from "../../../utils/rupiah";
 import Highlight from "./Highlight";
-import TextButton from "./TextButton";
 import Result from "./Result";
+import TextButton from "./TextButton";
 
 // Strip dots to get plain number string: "10.000.000" -> "10000000"
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
@@ -78,60 +68,41 @@ export default function CicilanCalculator() {
       )}
 
       <View style={styles.card}>
-        {/* Jumlah Uang */}
-        <View style={styles.inputGroup}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
+        {result !== null && (
+          <Pressable
+            onPress={handleReset}
+            style={({ pressed }) => [
+              {
+                alignSelf: "flex-end",
+                opacity: pressed ? 0.75 : 1,
+              },
+            ]}
           >
-            <Text style={styles.label}>Jumlah Uang</Text>
+            <Text style={styles.deleteButtton}>Hapus</Text>
+          </Pressable>
+        )}
 
-            {result !== null && (
-              <Pressable
-                onPress={handleReset}
-                style={[
-                  ({ pressed }) => {
-                    opacity: pressed ? 0.75 : 1;
-                  },
-                ]}
-              >
-                <Text style={styles.deleteButtton}>Hapus</Text>
-              </Pressable>
-            )}
-          </View>
-
-          <View style={styles.inputWrapper}>
-            <Text style={styles.prefix}>Rp</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="0"
-              placeholderTextColor="#c4c9d4"
-              keyboardType="numeric"
-              value={uangDisplay}
-              onChangeText={handleUangChange}
-            />
-          </View>
-        </View>
+        <Input
+          label="Jumlah Uang"
+          prefix="Rp"
+          placeholder="0"
+          keyboardType="numeric"
+          value={uangDisplay}
+          onUpdateValue={handleUangChange}
+        />
 
         <View style={styles.divider} />
 
-        {/* Jumlah Bulan */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Jumlah Bulan</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              placeholder="0"
-              placeholderTextColor="#c4c9d4"
-              keyboardType="numeric"
-              value={jumlahBulan}
-              onChangeText={handleBulanChange}
-            />
-            <Text style={styles.suffix}>bulan</Text>
-          </View>
-        </View>
+        <Input
+          label="Jumlah Uang"
+          suffix="bulan"
+          placeholder="0"
+          keyboardType="numeric"
+          value={jumlahBulan}
+          onUpdateValue={handleBulanChange}
+        />
+
+        <View style={styles.divider} />
       </View>
 
       {/* Hitung Button */}
@@ -158,8 +129,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(16),
     paddingBottom: verticalScale(16),
   },
-
-  // Card
   card: {
     backgroundColor: GlobalStyles.color.CARD,
     borderRadius: moderateScale(20),
@@ -176,56 +145,13 @@ const styles = StyleSheet.create({
   deleteButtton: {
     fontSize: moderateScale(18),
     color: "#df1111",
-    lineHeight: moderateScale(18),
     fontWeight: "700",
-  },
-  inputGroup: {
-    marginVertical: verticalScale(8),
-  },
-  label: {
-    fontSize: moderateScale(16),
-    lineHeight: moderateScale(16),
-    fontWeight: "700",
-    color: GlobalStyles.color.MUTED,
-    letterSpacing: 1.2,
-    textTransform: "uppercase",
-    marginBottom: 10,
-  },
-  inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: GlobalStyles.color.BG,
-    borderRadius: moderateScale(12),
-    borderWidth: moderateScale(1.5),
-    borderColor: GlobalStyles.color.BORDER,
-    paddingHorizontal: 14,
-    paddingVertical: 2,
-  },
-  prefix: {
-    fontSize: moderateScale(20),
-    fontWeight: "700",
-    color: GlobalStyles.color.MUTED,
-    marginRight: scale(8),
-  },
-  suffix: {
-    fontSize: moderateScale(20),
-    fontWeight: "600",
-    color: GlobalStyles.color.MUTED,
-    marginLeft: scale(8),
-  },
-  input: {
-    flex: 1,
-    fontSize: moderateScale(20),
-    fontWeight: "700",
-    color: GlobalStyles.color.TEXT,
-    paddingVertical: verticalScale(8),
   },
   divider: {
     height: moderateScale(1),
     backgroundColor: GlobalStyles.color.BORDER,
     marginVertical: verticalScale(8),
   },
-
   highlightCard: {
     borderRadius: moderateScale(20),
     paddingHorizontal: moderateScale(16),
