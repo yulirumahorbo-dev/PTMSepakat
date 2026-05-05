@@ -24,6 +24,13 @@ export default function Home({ navigation }) {
         label="INPUT NAMA ANGGOTA"
         color="blue"
       />
+
+      <MenuIcon
+        onPress={() => navigation.navigate("Pinjaman")}
+        iconName="cash"
+        label="PINJAMAN BARU"
+        color="red"
+      />
     </ScreenLayout>
   );
 }

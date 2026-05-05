@@ -94,7 +94,7 @@ export default function CicilanCalculator() {
         <View style={styles.divider} />
 
         <Input
-          label="Jumlah Uang"
+          label="Jumlah Bulan"
           suffix="bulan"
           placeholder="0"
           keyboardType="numeric"

@@ -1,5 +1,12 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { Home, Kalkulator, Pemasukan, Pengeluaran, Store } from "../screens";
+import {
+  Home,
+  Kalkulator,
+  Pemasukan,
+  Pengeluaran,
+  Pinjaman,
+  Store,
+} from "../screens";
 import { GlobalStyles } from "../constants/styles";
 
 const Stack = createNativeStackNavigator();
@@ -27,6 +34,18 @@ export default function Root() {
         component={Store}
         options={{
           title: "INPUT",
+          headerTitleStyle: {
+            color: GlobalStyles.color.ACCENT,
+            fontWeight: "500",
+          },
+          headerShadowVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="Pinjaman"
+        component={Pinjaman}
+        options={{
+          title: "PINJAMAN",
           headerTitleStyle: {
             color: GlobalStyles.color.ACCENT,
             fontWeight: "500",
