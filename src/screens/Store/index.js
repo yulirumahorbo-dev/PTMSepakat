@@ -1,15 +1,20 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { Input, ScreenLayout } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import { supabase } from "../../lib/supabase";
-import { InputContext } from "../../store/input-context";
+import {
+  updateInput,
+  clearField,
+  clearInput,
+} from "../../actions/inputActions";
 import TextButton from "../Kalkulator/components/TextButton";
 
 export default function Store({ navigation }) {
-  const { inputData, updateInput, clearField, clearInput } =
-    useContext(InputContext);
+  const dispatch = useDispatch();
+  const inputData = useSelector((state) => state.input);
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     nama: false,
@@ -17,7 +22,7 @@ export default function Store({ navigation }) {
   });
 
   function handleInputChange(field, value) {
-    updateInput(field, value);
+    dispatch(updateInput(field, value));
 
     if (value.trim() !== "" && credentialsInvalid[field]) {
       setCredentialsInvalid((prev) => ({
@@ -59,7 +64,7 @@ export default function Store({ navigation }) {
           },
         ]);
 
-        clearInput();
+        dispatch(clearInput());
         Alert.alert("Success", "Your data has been saved to the system.");
         navigation.navigate("Home");
       }
@@ -70,13 +75,14 @@ export default function Store({ navigation }) {
   }
 
   function handleClear() {
-    clearField("nama");
-    clearField("jabatan");
+    dispatch(clearField("nama"));
+    dispatch(clearField("jabatan"));
     setCredentialsInvalid({
       nama: false,
       jabatan: false,
     });
   }
+
   return (
     <ScreenLayout
       backgroundColor={GlobalStyles.color.BG}
@@ -117,6 +123,7 @@ export default function Store({ navigation }) {
     </ScreenLayout>
   );
 }
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: GlobalStyles.color.CARD,
