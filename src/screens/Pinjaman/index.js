@@ -1,25 +1,31 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearLoanField,
+  clearLoanInput,
+  updateLoanInput,
+} from "../../actions/loanActions";
 import { Divider, Input, ScreenLayout } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import { supabase } from "../../lib/supabase";
-import { PinjamanContext } from "../../store/pinjaman-context";
 import { formatInputDisplay } from "../../utils/rupiah";
 import TextButton from "../Kalkulator/components/TextButton";
 
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
 export default function Pinjaman({ navigation }) {
-  const { pinjamanData, updateInput, clearField, clearInput } =
-    useContext(PinjamanContext);
+  const dispatch = useDispatch();
+  const loanData = useSelector((state) => state.loan);
+
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     async function fetchUsers() {
       const { data, error } = await supabase
         .from("inputData")
-        .select("id, nama");
+        .select("id, name");
 
       if (error) {
         console.error("Fetch error:", error);
@@ -31,12 +37,12 @@ export default function Pinjaman({ navigation }) {
   }, []);
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
-    nama: false,
-    tanggal: false,
+    name: false,
+    date: false,
   });
 
   function handleInputChange(field, value) {
-    updateInput(field, value);
+    dispatch(updateLoanInput(field, value));
 
     if (value.trim() !== "" && credentialsInvalid[field]) {
       setCredentialsInvalid((prev) => ({
@@ -48,8 +54,8 @@ export default function Pinjaman({ navigation }) {
 
   function validateInput() {
     const inValid = {
-      nama: !pinjamanData.nama.trim(),
-      tanggal: !pinjamanData.tanggal.trim(),
+      name: !loanData.name.trim(),
+      date: !loanData.date.trim(),
     };
 
     setCredentialsInvalid(inValid);
@@ -70,17 +76,17 @@ export default function Pinjaman({ navigation }) {
   async function handleSubmit() {
     try {
       if (validateInput()) {
-        const { error } = await supabase.from("pinjaman").insert([
+        const { error } = await supabase.from("loansData").insert([
           {
-            nama: pinjamanData.nama,
-            tanggal: pinjamanData.tanggal,
-            jumlahUang: parseFloat(stripFormat(pinjamanData.jumlahUang)),
-            jumlahBulan: parseFloat(pinjamanData.jumlahBulan),
+            name: loanData.name,
+            date: loanData.date,
+            totalMoney: parseFloat(stripFormat(loanData.totalMoney)),
+            totalMonth: parseFloat(loanData.totalMonth),
             created_at: new Date(),
           },
         ]);
 
-        clearInput();
+        dispatch(clearLoanInput());
         Alert.alert("Success", "Your data has been saved to the system.");
         navigation.navigate("Home");
       }
@@ -91,15 +97,15 @@ export default function Pinjaman({ navigation }) {
   }
 
   function handleClear() {
-    clearField("nama");
-    clearField("tanggal");
-    clearField("jumlahUang");
-    clearField("jumlahBulan");
+    dispatch(clearLoanField("name"));
+    dispatch(clearLoanField("date"));
+    dispatch(clearLoanField("totalMoney"));
+    dispatch(clearLoanField("totalMonth"));
     setCredentialsInvalid({
-      nama: false,
-      tanggal: false,
-      jumlahUang: false,
-      jumlahBulan: false,
+      name: false,
+      date: false,
+      totalMoney: false,
+      totalMonth: false,
     });
   }
   return (
@@ -121,11 +127,11 @@ export default function Pinjaman({ navigation }) {
           <Text style={styles.deleteButtton}>Hapus</Text>
         </Pressable>
         <Input
-          label="Nama"
+          label="name"
           placeholder="Alexander Pakpahan"
           keyboardType="default"
-          value={pinjamanData.nama}
-          onUpdateValue={(text) => handleInputChange("nama", text)}
+          value={loanData.name}
+          onUpdateValue={(text) => handleInputChange("name", text)}
         />
 
         <Divider />
@@ -134,8 +140,8 @@ export default function Pinjaman({ navigation }) {
           label="Tanggal"
           placeholder="5/5/26"
           keyboardType="number"
-          value={pinjamanData.tanggal}
-          onUpdateValue={(text) => handleInputChange("tanggal", text)}
+          value={loanData.date}
+          onUpdateValue={(text) => handleInputChange("date", text)}
         />
 
         <Divider />
@@ -146,9 +152,9 @@ export default function Pinjaman({ navigation }) {
           placeholder="0"
           keyboardType="numeric"
           value={formatInputDisplay(
-            stripFormat(pinjamanData.jumlahUang).replace(/\D/g, ""),
+            stripFormat(loanData.totalMoney).replace(/\D/g, ""),
           )}
-          onUpdateValue={(text) => handleInputChange("jumlahUang", text)}
+          onUpdateValue={(text) => handleInputChange("totalMoney", text)}
         />
 
         <Divider />
@@ -158,8 +164,8 @@ export default function Pinjaman({ navigation }) {
           suffix="bulan"
           placeholder="0"
           keyboardType="numeric"
-          value={pinjamanData.jumlahBulan.replace(/\D/g, "")}
-          onUpdateValue={(text) => handleInputChange("jumlahBulan", text)}
+          value={loanData.totalMonth.replace(/\D/g, "")}
+          onUpdateValue={(text) => handleInputChange("totalMonth", text)}
         />
       </View>
 
