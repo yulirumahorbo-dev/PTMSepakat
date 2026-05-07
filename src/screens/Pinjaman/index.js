@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   clearLoanField,
   clearLoanInput,
@@ -17,25 +17,20 @@ import {
 } from "../../actions/loanActions";
 import { Divider, Input, ScreenLayout } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
+import useUsers from "../../hooks/useUsers";
 import { supabase } from "../../lib/supabase";
-import { fetchUsers } from "../../store/slices/usersSlice";
 import { formatInputDisplay } from "../../utils/rupiah";
 import TextButton from "../Kalkulator/components/TextButton";
 
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
 export default function Pinjaman({ navigation }) {
-  const dispatch = useDispatch();
+  const { users, loading, error } = useUsers();
   const loanData = useSelector((state) => state.loan);
-  const { data: users, loading, error } = useSelector((state) => state.users);
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     name: false,
     date: false,
   });
-
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, []);
 
   if (loading) return <ActivityIndicator />;
 
