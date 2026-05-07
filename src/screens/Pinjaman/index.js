@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -10,6 +18,7 @@ import {
 import { Divider, Input, ScreenLayout } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import { supabase } from "../../lib/supabase";
+import { fetchUsers } from "../../store/slices/usersSlice";
 import { formatInputDisplay } from "../../utils/rupiah";
 import TextButton from "../Kalkulator/components/TextButton";
 
@@ -18,28 +27,19 @@ const stripFormat = (formatted) => formatted.replace(/\./g, "");
 export default function Pinjaman({ navigation }) {
   const dispatch = useDispatch();
   const loanData = useSelector((state) => state.loan);
-
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    async function fetchUsers() {
-      const { data, error } = await supabase
-        .from("inputData")
-        .select("id, name");
-
-      if (error) {
-        console.error("Fetch error:", error);
-      } else {
-        setUsers(data);
-      }
-    }
-    fetchUsers();
-  }, []);
-
+  const { data: users, loading, error } = useSelector((state) => state.users);
   const [credentialsInvalid, setCredentialsInvalid] = useState({
     name: false,
     date: false,
   });
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, []);
+
+  if (loading) return <ActivityIndicator />;
+
+  if (error) return <Text>{error}</Text>;
 
   function handleInputChange(field, value) {
     dispatch(updateLoanInput(field, value));
@@ -108,12 +108,23 @@ export default function Pinjaman({ navigation }) {
       totalMonth: false,
     });
   }
+
   return (
     <ScreenLayout
       backgroundColor={GlobalStyles.color.BG}
       paddingHorizontal={scale(16)}
       headerShown
     >
+      <FlatList
+        data={users}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View>
+            <Text>{item.id}</Text>
+            <Text>{item.name}</Text>
+          </View>
+        )}
+      />
       <View style={styles.card}>
         <Pressable
           onPress={handleClear}
