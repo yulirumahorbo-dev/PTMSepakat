@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   Home,
   Kalkulator,
+  Kas,
   Pemasukan,
   Pengeluaran,
   Pinjaman,
@@ -15,6 +16,7 @@ export default function Root() {
   return (
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Kas" component={Kas} />
       <Stack.Screen name="Pemasukan" component={Pemasukan} />
       <Stack.Screen name="Pengeluaran" component={Pengeluaran} />
       <Stack.Screen
