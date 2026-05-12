@@ -20,6 +20,7 @@ import useUsers from "../../../hooks/useUsers";
 import { supabase } from "../../../lib/supabase";
 import { formatInputDisplay } from "../../../utils/rupiah";
 import TextButton from "../../Kalkulator/components/TextButton";
+import useFormValidation from "../../../hooks/useFormValidation";
 
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
@@ -27,10 +28,12 @@ export default function LoanForm({ navigation }) {
   const dispatch = useDispatch();
   const { users, loading, error } = useUsers();
   const loanData = useSelector((state) => state.loan);
-  const [credentialsInvalid, setCredentialsInvalid] = useState({
-    name: false,
-    date: false,
-  });
+  const { credentialsInvalid, setError, resetError } = useFormValidation([
+    "name",
+    "date",
+    "totalMoney",
+    "totalMonth",
+  ]);
 
   if (loading) return <ActivityIndicator />;
 
@@ -39,33 +42,26 @@ export default function LoanForm({ navigation }) {
   function handleInputChange(field, value) {
     dispatch(updateLoanInput(field, value));
 
-    if (value.trim() !== "" && credentialsInvalid[field]) {
-      setCredentialsInvalid((prev) => ({
-        ...prev,
-        [field]: false,
-      }));
-    }
+    if (value.trim() !== "") resetError(field);
   }
 
   function validateInput() {
-    const inValid = {
-      name: !loanData.name.trim(),
-      date: !loanData.date.trim(),
-    };
+    const requiredFields = ["name", "date", "totalMoney", "totalMonth"];
 
-    setCredentialsInvalid(inValid);
+    const invalidFields = requiredFields.filter(
+      (field) => !loanData[field].trim(),
+    );
 
-    const isInValid = Object.values(inValid).some(Boolean);
+    invalidFields.forEach((field) => setError(field));
 
-    if (isInValid) {
+    if (invalidFields.length > 0) {
       Alert.alert(
         "Incomplete Form",
         "Please fill in all required fields before continuing.",
       );
-      return false;
     }
 
-    return true;
+    return invalidFields.length === 0;
   }
 
   async function handleSubmit() {
@@ -92,15 +88,11 @@ export default function LoanForm({ navigation }) {
   }
 
   function handleClear() {
-    dispatch(clearLoanField("name"));
-    dispatch(clearLoanField("date"));
-    dispatch(clearLoanField("totalMoney"));
-    dispatch(clearLoanField("totalMonth"));
-    setCredentialsInvalid({
-      name: false,
-      date: false,
-      totalMoney: false,
-      totalMonth: false,
+    const fields = ["name", "date", "totalMoney", "totalMonth"];
+
+    fields.forEach((field) => {
+      dispatch(clearLoanField(field));
+      resetError(field);
     });
   }
 
@@ -139,6 +131,7 @@ export default function LoanForm({ navigation }) {
             value: loanData.date,
             onChangeText: (text) => handleInputChange("date", text),
           }}
+          inValid={credentialsInvalid.date}
         />
 
         <Divider />
@@ -154,6 +147,7 @@ export default function LoanForm({ navigation }) {
             ),
             onChangeText: (text) => handleInputChange("totalMoney", text),
           }}
+          inValid={credentialsInvalid.totalMoney}
         />
 
         <Divider />
@@ -167,6 +161,7 @@ export default function LoanForm({ navigation }) {
             value: loanData.totalMonth.replace(/\D/g, ""),
             onChangeText: (text) => handleInputChange("totalMonth", text),
           }}
+          inValid={credentialsInvalid.totalMonth}
         />
       </View>
 

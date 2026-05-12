@@ -11,46 +11,39 @@ import {
   clearInput,
 } from "../../actions/inputActions";
 import TextButton from "../Kalkulator/components/TextButton";
+import useFormValidation from "../../hooks/useFormValidation";
 
 export default function Store({ navigation }) {
   const dispatch = useDispatch();
   const inputData = useSelector((state) => state.input);
-
-  const [credentialsInvalid, setCredentialsInvalid] = useState({
-    name: false,
-    jabatan: false,
-  });
+  const { credentialsInvalid, setError, resetError } = useFormValidation([
+    "name",
+    "jabatan",
+  ]);
 
   function handleInputChange(field, value) {
     dispatch(updateInput(field, value));
 
-    if (value.trim() !== "" && credentialsInvalid[field]) {
-      setCredentialsInvalid((prev) => ({
-        ...prev,
-        [field]: false,
-      }));
-    }
+    if (value.trim() !== "") resetError(field);
   }
 
   function validateInput() {
-    const inValid = {
-      name: !inputData.name.trim(),
-      jabatan: !inputData.jabatan.trim(),
-    };
+    const requiredFields = ["name", "jabatan"];
 
-    setCredentialsInvalid(inValid);
+    const invalidFields = requiredFields.filter(
+      (field) => !inputData[field].trim(),
+    );
 
-    const isInValid = Object.values(inValid).some(Boolean);
+    invalidFields.forEach((field) => setError(field));
 
-    if (isInValid) {
+    if (invalidFields.length > 0) {
       Alert.alert(
         "Incomplete Form",
         "Please fill in all required fields before continuing.",
       );
-      return false;
     }
 
-    return true;
+    return invalidFields.length === 0;
   }
 
   async function handleSubmit() {
@@ -75,11 +68,11 @@ export default function Store({ navigation }) {
   }
 
   function handleClear() {
-    dispatch(clearField("name"));
-    dispatch(clearField("jabatan"));
-    setCredentialsInvalid({
-      name: false,
-      jabatan: false,
+    const fields = ["name", "jabatan"];
+
+    fields.forEach((field) => {
+      dispatch(clearField(field));
+      resetError(field);
     });
   }
 
