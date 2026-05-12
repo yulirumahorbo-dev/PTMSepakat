@@ -17,7 +17,7 @@ export default function Store({ navigation }) {
   const inputData = useSelector((state) => state.input);
 
   const [credentialsInvalid, setCredentialsInvalid] = useState({
-    nama: false,
+    name: false,
     jabatan: false,
   });
 
@@ -34,7 +34,7 @@ export default function Store({ navigation }) {
 
   function validateInput() {
     const inValid = {
-      nama: !inputData.nama.trim(),
+      name: !inputData.name.trim(),
       jabatan: !inputData.jabatan.trim(),
     };
 
@@ -58,7 +58,7 @@ export default function Store({ navigation }) {
       if (validateInput()) {
         const { error } = await supabase.from("inputData").insert([
           {
-            nama: inputData.nama,
+            name: inputData.name,
             jabatan: inputData.jabatan,
             created_at: new Date(),
           },
@@ -75,10 +75,10 @@ export default function Store({ navigation }) {
   }
 
   function handleClear() {
-    dispatch(clearField("nama"));
+    dispatch(clearField("name"));
     dispatch(clearField("jabatan"));
     setCredentialsInvalid({
-      nama: false,
+      name: false,
       jabatan: false,
     });
   }
@@ -103,17 +103,23 @@ export default function Store({ navigation }) {
         </Pressable>
         <Input
           label="Nama"
-          placeholder="Alexander Pakpahan"
-          keyboardType="default"
-          value={inputData.nama}
-          onUpdateValue={(text) => handleInputChange("nama", text)}
+          textInputConfig={{
+            placeholder: "Alexander Pakpahan",
+            keyboardType: "default",
+            value: inputData.name,
+            onChangeText: (text) => handleInputChange("name", text),
+          }}
+          inValid={credentialsInvalid.name}
         />
         <Input
           label="Jabatan"
-          placeholder="Ketua"
-          keyboardType="default"
-          value={inputData.jabatan}
-          onUpdateValue={(text) => handleInputChange("jabatan", text)}
+          textInputConfig={{
+            placeholder: "Ketua",
+            keyboardType: "default",
+            value: inputData.jabatan,
+            onChangeText: (text) => handleInputChange("jabatan", text),
+          }}
+          inValid={credentialsInvalid.jabatan}
         />
       </View>
 

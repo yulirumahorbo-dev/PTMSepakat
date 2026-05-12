@@ -85,10 +85,12 @@ export default function CicilanCalculator() {
         <Input
           label="Jumlah Uang"
           prefix="Rp"
-          placeholder="0"
-          keyboardType="numeric"
-          value={uangDisplay}
-          onUpdateValue={handleUangChange}
+          textInputConfig={{
+            placeholder: "0",
+            keyboardType: "numeric",
+            value: uangDisplay,
+            onChangeText: handleUangChange,
+          }}
         />
 
         <View style={styles.divider} />
@@ -96,10 +98,12 @@ export default function CicilanCalculator() {
         <Input
           label="Jumlah Bulan"
           suffix="bulan"
-          placeholder="0"
-          keyboardType="numeric"
-          value={jumlahBulan}
-          onUpdateValue={handleBulanChange}
+          textInputConfig={{
+            placeholder: "0",
+            keyboardType: "numeric",
+            value: jumlahBulan,
+            onChangeText: handleBulanChange,
+          }}
         />
 
         <View style={styles.divider} />

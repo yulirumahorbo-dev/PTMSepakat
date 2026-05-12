@@ -2,14 +2,13 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  FlatList,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   clearLoanField,
   clearLoanInput,
@@ -25,6 +24,7 @@ import TextButton from "../Kalkulator/components/TextButton";
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
 export default function Pinjaman({ navigation }) {
+  const dispatch = useDispatch();
   const { users, loading, error } = useUsers();
   const loanData = useSelector((state) => state.loan);
   const [credentialsInvalid, setCredentialsInvalid] = useState({
@@ -110,7 +110,7 @@ export default function Pinjaman({ navigation }) {
       paddingHorizontal={scale(16)}
       headerShown
     >
-      <FlatList
+      {/* <FlatList
         data={users}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -119,7 +119,7 @@ export default function Pinjaman({ navigation }) {
             <Text>{item.name}</Text>
           </View>
         )}
-      />
+      /> */}
       <View style={styles.card}>
         <Pressable
           onPress={handleClear}
@@ -134,20 +134,25 @@ export default function Pinjaman({ navigation }) {
         </Pressable>
         <Input
           label="name"
-          placeholder="Alexander Pakpahan"
-          keyboardType="default"
-          value={loanData.name}
-          onUpdateValue={(text) => handleInputChange("name", text)}
+          textInputConfig={{
+            placeholder: "Alexander Pakpahan",
+            keyboardType: "default",
+            value: loanData.name,
+            onChangeText: (text) => handleInputChange("name", text),
+          }}
+          inValid={credentialsInvalid.name}
         />
 
         <Divider />
 
         <Input
           label="Tanggal"
-          placeholder="5/5/26"
-          keyboardType="number"
-          value={loanData.date}
-          onUpdateValue={(text) => handleInputChange("date", text)}
+          textInputConfig={{
+            placeholder: "5/5/26",
+            keyboardType: "number",
+            value: loanData.date,
+            onChangeText: (text) => handleInputChange("date", text),
+          }}
         />
 
         <Divider />
@@ -155,12 +160,14 @@ export default function Pinjaman({ navigation }) {
         <Input
           label="Jumlah Uang"
           prefix="Rp"
-          placeholder="0"
-          keyboardType="numeric"
-          value={formatInputDisplay(
-            stripFormat(loanData.totalMoney).replace(/\D/g, ""),
-          )}
-          onUpdateValue={(text) => handleInputChange("totalMoney", text)}
+          textInputConfig={{
+            placeholder: "0",
+            keyboardType: "numeric",
+            value: formatInputDisplay(
+              stripFormat(loanData.totalMoney).replace(/\D/g, ""),
+            ),
+            onChangeText: (text) => handleInputChange("totalMoney", text),
+          }}
         />
 
         <Divider />
@@ -168,10 +175,12 @@ export default function Pinjaman({ navigation }) {
         <Input
           label="Jumlah Bulan"
           suffix="bulan"
-          placeholder="0"
-          keyboardType="numeric"
-          value={loanData.totalMonth.replace(/\D/g, "")}
-          onUpdateValue={(text) => handleInputChange("totalMonth", text)}
+          textInputConfig={{
+            placeholder: "0",
+            keyboardType: "numeric",
+            value: loanData.totalMonth.replace(/\D/g, ""),
+            onChangeText: (text) => handleInputChange("totalMonth", text),
+          }}
         />
       </View>
 
