@@ -1,8 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
-import rootReducer from "../reducers";
+import loanReducer from "./slices/loanSlice";
+import usersReducer from "./slices/usersSlice";
+import inputReducer from "./slices/inputSlice";
 
 const store = configureStore({
-  reducer: rootReducer,
+  reducer: {
+    loan: loanReducer,
+    users: usersReducer,
+    input: inputReducer,
+  },
 });
 
 export default store;

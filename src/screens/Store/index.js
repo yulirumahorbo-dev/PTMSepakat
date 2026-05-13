@@ -1,17 +1,16 @@
-import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { useDispatch, useSelector } from "react-redux";
 import { Input, ScreenLayout } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
+import useFormValidation from "../../hooks/useFormValidation";
 import { supabase } from "../../lib/supabase";
 import {
-  updateInput,
   clearField,
   clearInput,
-} from "../../actions/inputActions";
+  updateInput,
+} from "../../store/slices/inputSlice";
 import TextButton from "../Kalkulator/components/TextButton";
-import useFormValidation from "../../hooks/useFormValidation";
 
 export default function Store({ navigation }) {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ export default function Store({ navigation }) {
   ]);
 
   function handleInputChange(field, value) {
-    dispatch(updateInput(field, value));
+    dispatch(updateInput({ field, value }));
 
     if (value.trim() !== "") resetError(field);
   }
@@ -56,6 +55,8 @@ export default function Store({ navigation }) {
             created_at: new Date(),
           },
         ]);
+
+        if (error) throw new Error(error.message);
 
         dispatch(clearInput());
         Alert.alert("Success", "Your data has been saved to the system.");

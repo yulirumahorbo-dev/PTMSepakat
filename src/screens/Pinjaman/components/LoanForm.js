@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Pressable,
   StyleSheet,
   Text,
@@ -9,11 +10,6 @@ import {
 } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  clearLoanField,
-  clearLoanInput,
-  updateLoanInput,
-} from "../../../actions/loanActions";
 import { Divider, Input } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import useUsers from "../../../hooks/useUsers";
@@ -21,10 +17,17 @@ import { supabase } from "../../../lib/supabase";
 import { formatInputDisplay } from "../../../utils/rupiah";
 import TextButton from "../../Kalkulator/components/TextButton";
 import useFormValidation from "../../../hooks/useFormValidation";
+import {
+  clearLoanField,
+  clearLoanInput,
+  updateLoanInput,
+} from "../../../store/slices/loanSlice";
+import { useNavigation } from "@react-navigation/native";
 
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
-export default function LoanForm({ navigation }) {
+export default function LoanForm() {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const { users, loading, error } = useUsers();
   const loanData = useSelector((state) => state.loan);
@@ -35,12 +38,8 @@ export default function LoanForm({ navigation }) {
     "totalMonth",
   ]);
 
-  if (loading) return <ActivityIndicator />;
-
-  if (error) return <Text>{error}</Text>;
-
   function handleInputChange(field, value) {
-    dispatch(updateLoanInput(field, value));
+    dispatch(updateLoanInput({ field, value }));
 
     if (value.trim() !== "") resetError(field);
   }
@@ -77,6 +76,8 @@ export default function LoanForm({ navigation }) {
           },
         ]);
 
+        if (error) throw new Error(error.message);
+
         dispatch(clearLoanInput());
         Alert.alert("Success", "Your data has been saved to the system.");
         navigation.navigate("Home");
@@ -98,6 +99,16 @@ export default function LoanForm({ navigation }) {
 
   return (
     <View>
+      <FlatList
+        data={users}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View>
+            <Text>{item.id}</Text>
+            <Text>{item.name}</Text>
+          </View>
+        )}
+      />
       <View style={styles.card}>
         <Pressable
           onPress={handleClear}
