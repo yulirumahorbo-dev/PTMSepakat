@@ -13,6 +13,7 @@ export default function ExpensesList({ expenses }) {
       renderItem={renderExpenseItem}
       contentContainerStyle={styles.list}
       ListEmptyComponent={<Text style={styles.empty}>No expenses yet.</Text>}
+      scrollEnabled={false}
     />
   );
 }

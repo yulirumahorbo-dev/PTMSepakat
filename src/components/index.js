@@ -2,3 +2,8 @@ export { default as ScreenLayout } from "./UI/ScreenLayout";
 export { default as Input } from "./UI/Input";
 export { default as MenuIcon } from "./UI/MenuIcon";
 export { default as Divider } from "./UI/Divider";
+export { default as Highlight } from "./UI/Highlight";
+export { default as LoadingOverlay } from "./UI/LoadingOverlay";
+export { default as FormContainer } from "./UI/FormContainer";
+export { default as InputDate } from "./UI/InputDate";
+export { default as InputCategory } from "./UI/InputCategory";

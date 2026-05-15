@@ -1,19 +1,15 @@
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { ScrollView } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { Highlight, LoadingOverlay, ScreenLayout } from "../../components";
+import { GlobalStyles } from "../../constants/styles";
 import {
   selectAllExpenses,
   selectExpenseStatus,
   selectTotalAmount,
 } from "../../store/selectors/expensesSelectors";
+import { formatInputDisplay } from "../../utils/rupiah";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpensesList from "./components/ExpensesList";
-import ExpensesTotal from "./components/ExpensesTotal";
 
 export default function Pengeluaran() {
   const dispatch = useDispatch();
@@ -22,28 +18,20 @@ export default function Pengeluaran() {
   const total = useSelector(selectTotalAmount);
 
   if (status === "loading" && expenses.length === 0) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#6C47FF" />
-      </View>
-    );
+    return <LoadingOverlay />;
   }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-    >
-      <ExpensesTotal total={total} />
+    <ScreenLayout backgroundColor={GlobalStyles.color.BG} headerShown>
+      <Highlight
+        label="Total Pengeluaran"
+        value={`Rp${formatInputDisplay(`${total}`)}`}
+      />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <ExpenseForm />
 
-      <ExpenseForm />
-
-      <ExpensesList expenses={expenses} />
-    </KeyboardAvoidingView>
+        <ExpensesList expenses={expenses} />
+      </ScrollView>
+    </ScreenLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5" },
-  centered: { flex: 1, justifyContent: "center", alignItems: "center" },
-});

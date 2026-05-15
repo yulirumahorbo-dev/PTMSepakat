@@ -17,6 +17,7 @@ export const fetchExpenses = createAsyncThunk(
       amount: item.amount,
       date: item.date,
       description: item.description,
+      category: item.category,
     }));
   },
 );

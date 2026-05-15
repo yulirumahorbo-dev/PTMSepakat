@@ -18,7 +18,18 @@ export default function Root() {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Kas" component={Kas} />
       <Stack.Screen name="Pemasukan" component={Pemasukan} />
-      <Stack.Screen name="Pengeluaran" component={Pengeluaran} />
+      <Stack.Screen
+        name="Pengeluaran"
+        component={Pengeluaran}
+        options={{
+          title: "PENGELUARAN",
+          headerTitleStyle: {
+            color: "red",
+            fontWeight: "500",
+          },
+          headerShadowVisible: false,
+        }}
+      />
       <Stack.Screen
         name="Kalkulator"
         component={Kalkulator}
