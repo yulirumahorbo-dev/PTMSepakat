@@ -7,3 +7,4 @@ export { default as LoadingOverlay } from "./UI/LoadingOverlay";
 export { default as FormContainer } from "./UI/FormContainer";
 export { default as InputDate } from "./UI/InputDate";
 export { default as InputCategory } from "./UI/InputCategory";
+export { default as InputMoney } from "./UI/InputMoney";

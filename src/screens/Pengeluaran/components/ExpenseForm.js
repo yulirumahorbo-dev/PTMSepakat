@@ -18,6 +18,7 @@ import {
   Input,
   InputCategory,
   InputDate,
+  InputMoney,
 } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import { moderateScale, verticalScale } from "react-native-size-matters";
@@ -103,15 +104,9 @@ export default function ExpenseForm() {
         }}
       />
 
-      <Input
-        label="Jumlah Uang"
-        prefix="Rp"
-        textInputConfig={{
-          placeholder: "0",
-          keyboardType: "numeric",
-          value: form.amount,
-          onChangeText: (text) => handleChange("amount", text),
-        }}
+      <InputMoney
+        value={form.amount}
+        onChangeValue={(raw) => setForm((prev) => ({ ...prev, amount: raw }))}
       />
 
       <InputDate date={form.date} onPress={() => setShowDatePicker(true)} />

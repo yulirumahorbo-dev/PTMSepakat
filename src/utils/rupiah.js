@@ -14,3 +14,8 @@ export function formatInputDisplay(raw) {
   const digits = raw.replace(/\D/g, "");
   return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
+
+// Remove dots to get raw number string
+export const parseIDR = (formatted) => {
+  return formatted.replace(/\./g, "");
+};
