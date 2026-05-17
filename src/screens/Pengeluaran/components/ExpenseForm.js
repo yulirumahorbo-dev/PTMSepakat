@@ -15,6 +15,8 @@ import {
   InputCategory,
   InputDate,
   InputMoney,
+  LoadingOverlay,
+  TextButton,
 } from "../../../components";
 import useFormValidation from "../../../hooks/useFormValidation";
 import { addExpense } from "../../../store/slices/expensesSlice";
@@ -95,6 +97,10 @@ export default function ExpenseForm() {
     }
   }, [dispatch, form]);
 
+  if (isSubmitting) {
+    return <LoadingOverlay />;
+  }
+
   return (
     <FormContainer>
       <Input
@@ -138,30 +144,13 @@ export default function ExpenseForm() {
         <Text style={styles.errorText}>Please select a category</Text>
       )}
 
-      <TouchableOpacity
-        style={[styles.addBtn, isSubmitting && styles.addBtnDisabled]}
-        onPress={handleAdd}
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.addBtnText}>+ Add Expense</Text>
-        )}
-      </TouchableOpacity>
+      <TextButton onPress={handleAdd} primary>
+        + Add Expense
+      </TextButton>
     </FormContainer>
   );
 }
 
 const styles = StyleSheet.create({
   errorText: { color: "#FF4757", fontSize: 12, marginBottom: 8 },
-  addBtn: {
-    backgroundColor: "#6C47FF",
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 12,
-  },
-  addBtnDisabled: { opacity: 0.6 },
-  addBtnText: { color: "#fff", fontWeight: "700", fontSize: 15 },
 });

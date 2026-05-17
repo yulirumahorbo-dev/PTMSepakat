@@ -1,7 +1,7 @@
 import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useDispatch, useSelector } from "react-redux";
-import { Input, ScreenLayout } from "../../components";
+import { Input, ScreenLayout, TextButton } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import useFormValidation from "../../hooks/useFormValidation";
 import { supabase } from "../../lib/supabase";
@@ -10,7 +10,6 @@ import {
   clearInput,
   updateInput,
 } from "../../store/slices/inputSlice";
-import TextButton from "../Kalkulator/components/TextButton";
 
 export default function Store({ navigation }) {
   const dispatch = useDispatch();

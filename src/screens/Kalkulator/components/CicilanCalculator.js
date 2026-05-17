@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { Input } from "../../../components";
+import { Input, TextButton } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import { formatInputDisplay, formatRupiah } from "../../../utils/rupiah";
 import Highlight from "./Highlight";
 import Result from "./Result";
-import TextButton from "./TextButton";
 
 // Strip dots to get plain number string: "10.000.000" -> "10000000"
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
@@ -109,7 +108,6 @@ export default function CicilanCalculator() {
         <View style={styles.divider} />
       </View>
 
-      {/* Hitung Button */}
       <TextButton onPress={handleHitung} primary>
         Hitung Cicilan
       </TextButton>

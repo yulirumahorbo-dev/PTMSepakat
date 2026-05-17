@@ -1,6 +1,6 @@
 import { StyleSheet, Text, Pressable } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
-import { GlobalStyles } from "../../../constants/styles";
+import { GlobalStyles } from "../../constants/styles";
 
 export default function TextButton({ primary, onPress, children }) {
   return (

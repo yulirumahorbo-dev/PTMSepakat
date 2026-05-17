@@ -10,12 +10,11 @@ import {
 } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, Input } from "../../../components";
+import { Divider, Input, TextButton } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import useUsers from "../../../hooks/useUsers";
 import { supabase } from "../../../lib/supabase";
 import { formatInputDisplay } from "../../../utils/rupiah";
-import TextButton from "../../Kalkulator/components/TextButton";
 import useFormValidation from "../../../hooks/useFormValidation";
 import {
   clearLoanField,
