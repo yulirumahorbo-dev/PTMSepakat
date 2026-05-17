@@ -22,9 +22,19 @@ export default function Input({
 
   return (
     <View style={styles.inputGroup}>
-      <Text style={[styles.label, inValid && styles.inValidLabel]}>
-        {label}
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: scale(8),
+          marginBottom: verticalScale(8),
+        }}
+      >
+        <Text style={[styles.label, inValid && styles.inValidLabel]}>
+          {label}
+        </Text>
+        {inValid && <Text style={styles.errorText}>(Wajib diisi)</Text>}
+      </View>
+
       <View style={[styles.inputWrapper, inValid && styles.inValidWrapper]}>
         {prefix && <Text style={styles.prefix}>{prefix}</Text>}
         <TextInput
@@ -44,12 +54,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: moderateScale(16),
-    lineHeight: moderateScale(16),
     fontWeight: "700",
     color: GlobalStyles.color.MUTED,
     letterSpacing: 1.2,
     textTransform: "uppercase",
-    marginBottom: 10,
   },
   inputWrapper: {
     flexDirection: "row",
@@ -86,5 +94,9 @@ const styles = StyleSheet.create({
   },
   inValidLabel: {
     color: "red",
+  },
+  errorText: {
+    color: "red",
+    fontSize: moderateScale(14),
   },
 });

@@ -17,9 +17,18 @@ export default function InputCategory({
 
   return (
     <View style={styles.inputGroup}>
-      <Text style={[styles.label, inValid && styles.inValidLabel]}>
-        KATEGORI
-      </Text>
+      <View
+        style={{
+          flexDirection: "row",
+          gap: scale(8),
+          marginBottom: verticalScale(8),
+        }}
+      >
+        <Text style={[styles.label, inValid && styles.inValidLabel]}>
+          KATEGORI
+        </Text>
+        {inValid && <Text style={styles.errorText}>(Wajib dipilih)</Text>}
+      </View>
       <View style={[styles.inputWrapper, inValid && styles.inValidWrapper]}>
         {categories.map((cat) => {
           const isSelected = selected === cat;
@@ -48,12 +57,14 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: moderateScale(16),
-    lineHeight: moderateScale(16),
     fontWeight: "700",
     color: GlobalStyles.color.MUTED,
     letterSpacing: 1.2,
     textTransform: "uppercase",
-    marginBottom: 10,
+  },
+  errorText: {
+    color: "red",
+    fontSize: moderateScale(14),
   },
   inputWrapper: {
     gap: verticalScale(8),

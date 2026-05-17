@@ -1,13 +1,6 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Alert, Platform } from "react-native";
 import { useDispatch } from "react-redux";
 import {
   FormContainer,
@@ -140,17 +133,9 @@ export default function ExpenseForm() {
         inValid={credentialsInvalid.category}
       />
 
-      {credentialsInvalid.category && (
-        <Text style={styles.errorText}>Please select a category</Text>
-      )}
-
       <TextButton onPress={handleAdd} primary>
         + Add Expense
       </TextButton>
     </FormContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  errorText: { color: "#FF4757", fontSize: 12, marginBottom: 8 },
-});
