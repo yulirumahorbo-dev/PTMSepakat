@@ -1,7 +1,7 @@
 import { formatInputDisplay, parseIDR } from "../../utils/rupiah";
 import Input from "./Input";
 
-export default function InputMoney({ value, onChangeValue, ...rest }) {
+export default function InputMoney({ value, inValid, onChangeValue, ...rest }) {
   const handleChange = (text) => {
     const raw = parseIDR(text).replace(/\D/g, "");
     const formatted = formatInputDisplay(raw);
@@ -20,6 +20,7 @@ export default function InputMoney({ value, onChangeValue, ...rest }) {
         onChangeText: handleChange,
         ...rest,
       }}
+      inValid={inValid}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
@@ -6,9 +6,7 @@ import {
   Pressable,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
-  View,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch } from "react-redux";
@@ -22,6 +20,7 @@ import {
 } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import { moderateScale, verticalScale } from "react-native-size-matters";
+import useFormValidation from "../../../hooks/useFormValidation";
 
 const CATEGORIES = [
   "Anggaran Dasar - Menikah",
@@ -31,24 +30,28 @@ const CATEGORIES = [
   "Lainnya",
 ];
 
+const FIELDS = ["description", "amount", "category"];
+
 const today = new Date();
 const initialForm = { description: "", amount: "", date: today, category: "" };
 
 export default function ExpenseForm() {
   const dispatch = useDispatch();
   const [form, setForm] = useState(initialForm);
-  const [formError, setFormError] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // ← local loading
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { credentialsInvalid, resetError, setError } =
+    useFormValidation(FIELDS);
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
-    if (value.trim()) setFormError((prev) => ({ ...prev, [field]: false }));
+    if (value.trim()) resetError(field);
   }
 
   function handleCategorySelect(category) {
     setForm((prev) => ({ ...prev, category }));
-    setFormError((prev) => ({ ...prev, category: false }));
+    resetError("category");
   }
 
   function handleDateChange(event, selectedDate) {
@@ -58,13 +61,16 @@ export default function ExpenseForm() {
   }
 
   function validateForm() {
-    const errors = {
-      description: !form.description.trim(),
-      amount: !form.amount.trim() || isNaN(parseFloat(form.amount)),
-      category: !form.category,
-    };
-    setFormError(errors);
-    return !Object.values(errors).some(Boolean);
+    const isDescriptionInvalid = !form.description.trim();
+    const isAmountInvalid =
+      !form.amount.trim() || isNaN(parseFloat(form.amount));
+    const isCategoryInvalid = !form.category;
+
+    if (isDescriptionInvalid) setError("description");
+    if (isAmountInvalid) setError("amount");
+    if (isCategoryInvalid) setError("category");
+
+    return !isDescriptionInvalid && !isAmountInvalid && !isCategoryInvalid;
   }
 
   const handleAdd = useCallback(async () => {
@@ -82,14 +88,13 @@ export default function ExpenseForm() {
           date: form.date.toISOString(),
           category: form.category,
         }),
-      ).unwrap(); // ← throws if rejected
+      ).unwrap();
 
       setForm(initialForm);
-      setFormError({});
     } catch (err) {
       Alert.alert("Failed", err);
     } finally {
-      setIsSubmitting(false); // ← always stops loading
+      setIsSubmitting(false);
     }
   }, [dispatch, form]);
 
@@ -97,6 +102,7 @@ export default function ExpenseForm() {
     <FormContainer>
       <Input
         label="Deskripsi"
+        inValid={credentialsInvalid.description}
         textInputConfig={{
           placeholder: "Deskripsi",
           value: form.description,
@@ -106,7 +112,11 @@ export default function ExpenseForm() {
 
       <InputMoney
         value={form.amount}
-        onChangeValue={(raw) => setForm((prev) => ({ ...prev, amount: raw }))}
+        onChangeValue={(raw) => {
+          setForm((prev) => ({ ...prev, amount: raw }));
+          if (raw) resetError("amount");
+        }}
+        inValid={credentialsInvalid.amount}
       />
 
       <InputDate date={form.date} onPress={() => setShowDatePicker(true)} />
@@ -120,8 +130,7 @@ export default function ExpenseForm() {
         />
       )}
 
-      {/* Category */}
-      <InputCategory>
+      <InputCategory inValid={credentialsInvalid.category}>
         {CATEGORIES.map((cat) => {
           const isSelected = form.category === cat;
           return (
@@ -130,7 +139,6 @@ export default function ExpenseForm() {
               style={[
                 styles.categoryChip,
                 isSelected && styles.categoryChipSelected,
-                formError.category && styles.categoryChipError,
               ]}
               onPress={() => handleCategorySelect(cat)}
             >
@@ -147,11 +155,10 @@ export default function ExpenseForm() {
         })}
       </InputCategory>
 
-      {formError.category && (
+      {credentialsInvalid.category && (
         <Text style={styles.errorText}>Please select a category</Text>
       )}
 
-      {/* Submit */}
       <TouchableOpacity
         style={[styles.addBtn, isSubmitting && styles.addBtnDisabled]}
         onPress={handleAdd}

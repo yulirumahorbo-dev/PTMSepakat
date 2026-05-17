@@ -43,4 +43,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: scale(8),
     paddingVertical: scale(8),
   },
+  inValidWrapper: {
+    borderColor: "red",
+  },
+  inValidLabel: {
+    color: "red",
+  },
 });
