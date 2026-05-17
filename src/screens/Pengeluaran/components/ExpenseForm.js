@@ -1,16 +1,14 @@
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useDispatch } from "react-redux";
-import { addExpense } from "../../../store/slices/expensesSlice";
 import {
   FormContainer,
   Input,
@@ -18,9 +16,8 @@ import {
   InputDate,
   InputMoney,
 } from "../../../components";
-import { GlobalStyles } from "../../../constants/styles";
-import { moderateScale, verticalScale } from "react-native-size-matters";
 import useFormValidation from "../../../hooks/useFormValidation";
+import { addExpense } from "../../../store/slices/expensesSlice";
 
 const CATEGORIES = [
   "Anggaran Dasar - Menikah",
@@ -130,30 +127,12 @@ export default function ExpenseForm() {
         />
       )}
 
-      <InputCategory inValid={credentialsInvalid.category}>
-        {CATEGORIES.map((cat) => {
-          const isSelected = form.category === cat;
-          return (
-            <Pressable
-              key={cat}
-              style={[
-                styles.categoryChip,
-                isSelected && styles.categoryChipSelected,
-              ]}
-              onPress={() => handleCategorySelect(cat)}
-            >
-              <Text
-                style={[
-                  styles.categoryChipText,
-                  isSelected && styles.categoryChipTextSelected,
-                ]}
-              >
-                {cat}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </InputCategory>
+      <InputCategory
+        categories={CATEGORIES}
+        selected={form.category}
+        onSelect={handleCategorySelect}
+        inValid={credentialsInvalid.category}
+      />
 
       {credentialsInvalid.category && (
         <Text style={styles.errorText}>Please select a category</Text>
@@ -176,32 +155,6 @@ export default function ExpenseForm() {
 
 const styles = StyleSheet.create({
   errorText: { color: "#FF4757", fontSize: 12, marginBottom: 8 },
-  categoryLabel: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#555",
-    marginTop: 12,
-    marginBottom: 8,
-  },
-  categoryLabelError: { color: "#FF4757" },
-  categoryContainer: { flexDirection: "column", gap: 8 },
-  categoryChip: {
-    backgroundColor: GlobalStyles.color.BG,
-    borderRadius: moderateScale(12),
-    borderWidth: moderateScale(1.5),
-    borderColor: GlobalStyles.color.BORDER,
-    paddingHorizontal: 14,
-    paddingVertical: 2,
-  },
-  categoryChipSelected: { backgroundColor: "#6C47FF", borderColor: "#6C47FF" },
-  categoryChipError: { borderColor: "#FF4757" },
-  categoryChipText: {
-    fontSize: moderateScale(20),
-    fontWeight: "700",
-    color: GlobalStyles.color.TEXT,
-    paddingVertical: verticalScale(8),
-  },
-  categoryChipTextSelected: { color: "#fff", fontWeight: "700" },
   addBtn: {
     backgroundColor: "#6C47FF",
     borderRadius: 8,
