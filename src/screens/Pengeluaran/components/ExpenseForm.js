@@ -1,6 +1,13 @@
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useState } from "react";
-import { Alert, Platform } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { useDispatch } from "react-redux";
 import {
   FormContainer,
@@ -27,9 +34,14 @@ const FIELDS = ["description", "amount", "category"];
 const today = new Date();
 const initialForm = { description: "", amount: "", date: today, category: "" };
 
-export default function ExpenseForm() {
+export default function ExpenseForm({
+  initialValues = initialForm,
+  submitLabel = "+ Add Expense",
+  onCancel,
+  onSubmit,
+}) {
   const dispatch = useDispatch();
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(initialValues);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -65,30 +77,34 @@ export default function ExpenseForm() {
     return !isDescriptionInvalid && !isAmountInvalid && !isCategoryInvalid;
   }
 
-  const handleAdd = useCallback(async () => {
+  const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
       Alert.alert("Incomplete", "Please fill in all fields correctly.");
       return;
     }
 
+    const formData = {
+      description: form.description.trim(),
+      amount: parseFloat(form.amount),
+      date: form.date.toISOString(),
+      category: form.category,
+    };
+
     try {
       setIsSubmitting(true);
-      await dispatch(
-        addExpense({
-          description: form.description.trim(),
-          amount: parseFloat(form.amount),
-          date: form.date.toISOString(),
-          category: form.category,
-        }),
-      ).unwrap();
 
-      setForm(initialForm);
+      if (onSubmit) {
+        await onSubmit(formData);
+      } else {
+        await dispatch(addExpense(formData)).unwrap();
+        setForm(initialForm);
+      }
     } catch (err) {
       Alert.alert("Failed", err);
     } finally {
       setIsSubmitting(false);
     }
-  }, [dispatch, form]);
+  }, [dispatch, form, onSubmit]);
 
   if (isSubmitting) {
     return <LoadingOverlay />;
@@ -133,9 +149,10 @@ export default function ExpenseForm() {
         inValid={credentialsInvalid.category}
       />
 
-      <TextButton onPress={handleAdd} primary>
-        + Add Expense
+      <TextButton onPress={handleSubmit} primary>
+        {submitLabel}
       </TextButton>
+      {onCancel && <TextButton onPress={onCancel}>Cancel</TextButton>}
     </FormContainer>
   );
 }
