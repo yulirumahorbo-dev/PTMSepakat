@@ -3,6 +3,7 @@ import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { GlobalStyles } from "../../constants/styles";
 
 export default function InputCategory({
+  label,
   categories,
   selected,
   onSelect,
@@ -25,7 +26,7 @@ export default function InputCategory({
         }}
       >
         <Text style={[styles.label, inValid && styles.inValidLabel]}>
-          KATEGORI
+          {label}
         </Text>
         {inValid && <Text style={styles.errorText}>(Wajib dipilih)</Text>}
       </View>
