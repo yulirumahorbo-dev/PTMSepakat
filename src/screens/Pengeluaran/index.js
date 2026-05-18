@@ -10,12 +10,18 @@ import {
 import { formatInputDisplay } from "../../utils/rupiah";
 import ExpenseForm from "./components/ExpenseForm";
 import ExpensesList from "./components/ExpensesList";
+import { useEffect } from "react";
+import { fetchExpenses } from "../../store/slices/expensesSlice";
 
 export default function Pengeluaran() {
   const dispatch = useDispatch();
   const expenses = useSelector(selectAllExpenses);
   const status = useSelector(selectExpenseStatus);
   const total = useSelector(selectTotalAmount);
+
+  useEffect(() => {
+    dispatch(fetchExpenses());
+  }, [dispatch]);
 
   if (status === "loading" && expenses.length === 0) {
     return <LoadingOverlay />;
