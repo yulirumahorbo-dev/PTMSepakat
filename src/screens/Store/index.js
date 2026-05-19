@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { useDispatch } from "react-redux";
 import {
@@ -13,7 +20,12 @@ import {
 } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import useFormValidation from "../../hooks/useFormValidation";
+import { supabase } from "../../lib/supabase";
 import { addMember } from "../../store/slices/membershipSlice";
+import {
+  generateFamilyNumber,
+  generateMemberNumber,
+} from "../../utils/membership";
 
 const FIELDS = [
   "husbandName",
@@ -31,6 +43,9 @@ const initialForm = {
   wifeRole: "",
   address: "",
 };
+
+const existingNumbers = ["LBP-2025-0001-01", "LBP-2025-0002-01"];
+
 export default function Store({
   navigation,
   initialValue = initialForm,
@@ -41,6 +56,7 @@ export default function Store({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { credentialsInvalid, resetError, setError } =
     useFormValidation(FIELDS);
+  const [result, setResult] = useState(null);
 
   function handleChange(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -73,21 +89,61 @@ export default function Store({
       return;
     }
 
-    const formData = {
-      husbandName: form.husbandName.trim(),
-      husbandRole: form.husbandRole,
-      wifeName: form.wifeName.trim(),
-      wifeRole: form.wifeRole,
-      address: form.address.trim(),
-    };
-
     try {
       setIsSubmitting(true);
 
+      const { data: seqData, error: seqError } = await supabase.rpc(
+        "get_next_family_sequence",
+      );
+
+      if (seqError) throw seqError.message;
+
+      const year = new Date().getFullYear();
+      const familyNumber = generateFamilyNumber(year, seqData);
+      const husbandNumber = generateMemberNumber(familyNumber, "01");
+      const wifeNumber = generateMemberNumber(familyNumber, "02");
+
+      const { data: family, error: familyError } = await supabase
+        .from("families")
+        .insert({
+          family_membership_number: familyNumber,
+          address: form.address.trim(),
+          sequence_number: seqData,
+        })
+        .select()
+        .single();
+
+      if (familyError) throw familyError.message;
+
+      const { error: membersError } = await supabase.from("members").insert([
+        {
+          family_id: family.id,
+          membership_number: husbandNumber,
+          name: form.husbandName.trim(),
+          role: form.husbandRole,
+        },
+        {
+          family_id: family.id,
+          membership_number: wifeNumber,
+          name: form.wifeName.trim(),
+          role: form.wifeRole,
+        },
+      ]);
+
+      if (membersError) throw membersError.message;
+
+      setResult({
+        familyId: familyNumber,
+        husband: `${form.husbandName} (${husbandNumber})`,
+        wife: `${form.wifeName} (${wifeNumber})`,
+      });
+
       if (onSubmit) {
-        await onSubmit(formData);
+        await onSubmit({ familyNumber, husbandNumber, wifeNumber });
       } else {
-        await dispatch(addMember(formData)).unwrap();
+        dispatch(
+          addMember({ familyNumber, husbandNumber, wifeNumber, ...form }),
+        );
         setForm(initialForm);
       }
     } catch (err) {
@@ -191,6 +247,14 @@ export default function Store({
             Input Data
           </TextButton>
         </FormContainer>
+
+        {result && (
+          <View>
+            <Text>Family ID : {result.familyId}</Text>
+            <Text>Husband : {result.husband}</Text>
+            <Text>Wife : {result.wife}</Text>
+          </View>
+        )}
       </ScrollView>
     </ScreenLayout>
   );
