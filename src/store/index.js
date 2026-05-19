@@ -1,14 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import loanReducer from "./slices/loanSlice";
-import usersReducer from "./slices/usersSlice";
-import inputReducer from "./slices/inputSlice";
 import expensesReducer from "./slices/expensesSlice";
+import inputReducer from "./slices/inputSlice";
+import loanReducer from "./slices/loanSlice";
+import membersReducer from "./slices/membershipSlice";
 
 const store = configureStore({
   reducer: {
     loan: loanReducer,
-    users: usersReducer,
-    input: inputReducer,
+    members: membersReducer,
     expenses: expensesReducer,
   },
 });

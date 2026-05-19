@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   Pressable,
@@ -10,25 +9,28 @@ import {
 } from "react-native";
 import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useDispatch, useSelector } from "react-redux";
-import { Divider, Input, TextButton } from "../../../components";
+import {
+  Divider,
+  Input,
+  LoadingOverlay,
+  TextButton,
+} from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
-import useUsers from "../../../hooks/useUsers";
-import { supabase } from "../../../lib/supabase";
-import { formatInputDisplay } from "../../../utils/rupiah";
 import useFormValidation from "../../../hooks/useFormValidation";
+import useMembers from "../../../hooks/useMembers";
+import { supabase } from "../../../lib/supabase";
 import {
   clearLoanField,
   clearLoanInput,
   updateLoanInput,
 } from "../../../store/slices/loanSlice";
-import { useNavigation } from "@react-navigation/native";
+import { formatInputDisplay } from "../../../utils/rupiah";
 
 const stripFormat = (formatted) => formatted.replace(/\./g, "");
 
 export default function LoanForm() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { users, loading, error } = useUsers();
   const loanData = useSelector((state) => state.loan);
   const { credentialsInvalid, setError, resetError } = useFormValidation([
     "name",
@@ -36,6 +38,7 @@ export default function LoanForm() {
     "totalMoney",
     "totalMonth",
   ]);
+  const { members, status, error } = useMembers();
 
   function handleInputChange(field, value) {
     dispatch(updateLoanInput({ field, value }));
@@ -96,10 +99,14 @@ export default function LoanForm() {
     });
   }
 
+  if (status === "loading" && members.length === 0) {
+    return <LoadingOverlay />;
+  }
+
   return (
     <View>
       <FlatList
-        data={users}
+        data={members}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View>

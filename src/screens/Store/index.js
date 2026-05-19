@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Divider,
   FormContainer,
@@ -156,6 +156,9 @@ export default function Store({
   if (isSubmitting) {
     return <LoadingOverlay />;
   }
+
+  const debug = useSelector((state) => state); // log entire store
+  console.log("STORE:", JSON.stringify(debug));
 
   return (
     <ScreenLayout backgroundColor={GlobalStyles.color.BG} headerShown>

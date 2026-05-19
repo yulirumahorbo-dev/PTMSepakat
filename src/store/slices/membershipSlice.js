@@ -7,18 +7,15 @@ export const fetchMembers = createAsyncThunk(
     const response = await supabase
       .from("members")
       .select("*")
-      .order("date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     if (!response) return rejectWithValue("No response from Supabase");
     if (response.error) return rejectWithValue(response.error.message);
 
     return response.data.map((item) => ({
       id: item.id,
-      husbandName: item.husbandName,
-      husbandRole: item.husbandRole,
-      wifeName: item.wifeName,
-      wifeRole: item.wifeRole,
-      address: item.address,
+      name: item.name,
+      role: item.role,
     }));
   },
 );
