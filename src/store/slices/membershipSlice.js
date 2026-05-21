@@ -16,6 +16,7 @@ export const fetchMembers = createAsyncThunk(
       id: item.id,
       name: item.name,
       role: item.role,
+      family_id: item.family_id,
     }));
   },
 );

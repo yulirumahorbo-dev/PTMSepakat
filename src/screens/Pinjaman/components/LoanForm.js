@@ -4,11 +4,18 @@ import { useDispatch } from "react-redux";
 import { FormShell, Input, InputDate, InputMoney } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 import useForm from "../../../hooks/useForm";
+import useMembers from "../../../hooks/useMembers";
 import { addLoan } from "../../../store/slices/loansSlice";
+import MemberAutocomplete from "./MemberAutoComplete";
 
 const today = new Date();
 const FIELDS = ["name", "date", "totalMoney", "totalMonth"];
-const initialForm = { name: "", date: today, totalMoney: "", totalMonth: "" };
+const initialForm = {
+  name: "",
+  date: today,
+  totalMoney: "",
+  totalMonth: "",
+};
 
 function validateLoan(form) {
   const error = [];
@@ -26,6 +33,7 @@ export default function LoanForm({
   onSubmit,
 }) {
   const dispatch = useDispatch();
+  const { members } = useMembers();
 
   const {
     form,
@@ -42,6 +50,7 @@ export default function LoanForm({
     onSubmit: async (f) => {
       const payload = {
         name: f.name.trim(),
+        family_id: f.family_id,
         totalMoney: parseFloat(f.totalMoney),
         totalMonth: parseFloat(f.totalMonth),
         date: f.date.toISOString(),
@@ -73,14 +82,18 @@ export default function LoanForm({
         <Text style={styles.deleteButtton}>Hapus</Text>
       </Pressable>
 
-      <Input
-        label="Nama"
+      <MemberAutocomplete
+        value={form.name}
+        members={members}
+        onChangeText={(text) => handleChange("name", text)}
         inValid={credentialsInvalid.name}
-        textInputConfig={{
-          placeholder: "Alexander Silalahi",
-          value: form.name,
-          onChangeText: (text) => handleChange("name", text),
-        }}
+        onSelect={(member) =>
+          setForm((prev) => ({
+            ...prev,
+            name: member.name,
+            family_id: member.family_id,
+          }))
+        }
       />
 
       <InputDate
