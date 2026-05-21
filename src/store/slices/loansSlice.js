@@ -5,7 +5,7 @@ export const fetchLoans = createAsyncThunk(
   "loans/fetchAll",
   async (_, { rejectWithValue }) => {
     const response = await supabase
-      .from("loansData")
+      .from("loans")
       .select("*")
       .order("date", { ascending: false });
 
@@ -25,7 +25,7 @@ export const addLoan = createAsyncThunk(
   "loans/add",
   async (loanData, { rejectWithValue }) => {
     const response = await supabase
-      .from("loansData")
+      .from("loans")
       .insert(loanData)
       .select()
       .single();
@@ -41,7 +41,7 @@ export const editLoan = createAsyncThunk(
   "loans/edit",
   async ({ id, loanData }, { rejectWithValue }) => {
     const response = await supabase
-      .from("loansData")
+      .from("loans")
       .update(loanData)
       .eq("id", id)
       .select()
@@ -57,7 +57,7 @@ export const editLoan = createAsyncThunk(
 export const removeLoan = createAsyncThunk(
   "loans/remove",
   async (id, { rejectWithValue }) => {
-    const { error } = await supabase.from("loansData").delete().eq("id", id);
+    const { error } = await supabase.from("loans").delete().eq("id", id);
 
     if (error) return rejectWithValue(error.message);
 
