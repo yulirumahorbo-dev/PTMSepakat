@@ -1,13 +1,5 @@
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { useCallback, useState } from "react";
-import {
-  ActivityIndicator,
-  Alert,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { Alert } from "react-native";
 import { useDispatch } from "react-redux";
 import {
   FormContainer,
@@ -29,9 +21,10 @@ const CATEGORIES = [
   "Lainnya",
 ];
 
+const today = new Date();
+
 const FIELDS = ["description", "amount", "category"];
 
-const today = new Date();
 const initialForm = { description: "", amount: "", date: today, category: "" };
 
 export default function ExpenseForm({
@@ -42,7 +35,6 @@ export default function ExpenseForm({
 }) {
   const dispatch = useDispatch();
   const [form, setForm] = useState(initialValues);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { credentialsInvalid, resetError, setError } =
@@ -56,12 +48,6 @@ export default function ExpenseForm({
   function handleCategorySelect(category) {
     setForm((prev) => ({ ...prev, category }));
     resetError("category");
-  }
-
-  function handleDateChange(event, selectedDate) {
-    if (Platform.OS === "android") setShowDatePicker(false);
-    if (event.type === "dismissed") return;
-    if (selectedDate) setForm((prev) => ({ ...prev, date: selectedDate }));
   }
 
   function validateForm() {
@@ -131,18 +117,13 @@ export default function ExpenseForm({
         inValid={credentialsInvalid.amount}
       />
 
-      <InputDate date={form.date} onPress={() => setShowDatePicker(true)} />
-      {showDatePicker && (
-        <DateTimePicker
-          value={form.date}
-          mode="date"
-          display={Platform.OS === "ios" ? "inline" : "default"}
-          maximumDate={today}
-          onChange={handleDateChange}
-        />
-      )}
+      <InputDate
+        date={form.date}
+        onDateChange={(date) => setForm((prev) => ({ ...prev, date }))}
+      />
 
       <InputCategory
+        label="KATEGORI"
         categories={CATEGORIES}
         selected={form.category}
         onSelect={handleCategorySelect}

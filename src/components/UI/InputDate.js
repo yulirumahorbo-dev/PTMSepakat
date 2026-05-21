@@ -1,15 +1,24 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { useState } from "react";
+import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { GlobalStyles } from "../../constants/styles";
 import { formatDate } from "../../utils/date";
 
 const today = new Date();
 
-export default function InputDate({ style, inValid, onPress, date }) {
+export default function InputDate({ style, inValid, date, onDateChange }) {
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const inputStyles = [styles.input];
 
   if (inValid) {
     inputStyles.push(styles.inValidInput);
+  }
+
+  function handleDateChange(event, selectedDate) {
+    if (Platform.OS === "android") setShowDatePicker(false);
+    if (event.type === "dismissed") return;
+    if (selectedDate) onDateChange(selectedDate);
   }
 
   return (
@@ -19,11 +28,20 @@ export default function InputDate({ style, inValid, onPress, date }) {
       </Text>
       <Pressable
         style={[styles.inputWrapper, inValid && styles.inValidWrapper]}
-        onPress={onPress}
+        onPress={() => setShowDatePicker(true)}
       >
-        <Text style={styles.input}>{formatDate(`${date}`)}</Text>
+        <Text style={styles.input}>{formatDate(date)}</Text>
         <Text style={styles.suffix}>📅</Text>
       </Pressable>
+      {showDatePicker && (
+        <DateTimePicker
+          value={date}
+          mode="date"
+          display={Platform.OS === "ios" ? "inline" : "default"}
+          maximumDate={today}
+          onChange={handleDateChange}
+        />
+      )}
     </View>
   );
 }
