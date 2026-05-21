@@ -26,6 +26,7 @@ export default function useForm({ initialValues, fields, validate, onSubmit }) {
     try {
       setIsSubmitting(true);
       await onSubmit(form);
+      setForm(initialValues);
     } catch (err) {
       Alert.alert("Failed", String(err));
     } finally {
