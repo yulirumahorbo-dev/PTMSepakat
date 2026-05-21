@@ -1,16 +1,12 @@
-import { useCallback, useState } from "react";
-import { Alert } from "react-native";
 import { useDispatch } from "react-redux";
 import {
-  FormContainer,
+  FormShell,
   Input,
   InputCategory,
   InputDate,
   InputMoney,
-  LoadingOverlay,
-  TextButton,
 } from "../../../components";
-import useFormValidation from "../../../hooks/useFormValidation";
+import useForm from "../../../hooks/useForm";
 import { addExpense } from "../../../store/slices/expensesSlice";
 
 const CATEGORIES = [
@@ -22,10 +18,16 @@ const CATEGORIES = [
 ];
 
 const today = new Date();
-
 const FIELDS = ["description", "amount", "category"];
-
 const initialForm = { description: "", amount: "", date: today, category: "" };
+
+function validateExpense(form) {
+  const errors = [];
+  if (!form.description.trim()) errors.push("description");
+  if (!form.amount || isNaN(parseFloat(form.amount))) errors.push("amount");
+  if (!form.category) errors.push("category");
+  return errors;
+}
 
 export default function ExpenseForm({
   initialValues = initialForm,
@@ -34,70 +36,41 @@ export default function ExpenseForm({
   onSubmit,
 }) {
   const dispatch = useDispatch();
-  const [form, setForm] = useState(initialValues);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { credentialsInvalid, resetError, setError } =
-    useFormValidation(FIELDS);
-
-  function handleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (value.trim()) resetError(field);
-  }
-
-  function handleCategorySelect(category) {
-    setForm((prev) => ({ ...prev, category }));
-    resetError("category");
-  }
-
-  function validateForm() {
-    const isDescriptionInvalid = !form.description.trim();
-    const isAmountInvalid =
-      !form.amount.trim() || isNaN(parseFloat(form.amount));
-    const isCategoryInvalid = !form.category;
-
-    if (isDescriptionInvalid) setError("description");
-    if (isAmountInvalid) setError("amount");
-    if (isCategoryInvalid) setError("category");
-
-    return !isDescriptionInvalid && !isAmountInvalid && !isCategoryInvalid;
-  }
-
-  const handleSubmit = useCallback(async () => {
-    if (!validateForm()) {
-      Alert.alert("Incomplete", "Please fill in all fields correctly.");
-      return;
-    }
-
-    const formData = {
-      description: form.description.trim(),
-      amount: parseFloat(form.amount),
-      date: form.date.toISOString(),
-      category: form.category,
-    };
-
-    try {
-      setIsSubmitting(true);
-
+  const {
+    form,
+    setForm,
+    handleChange,
+    credentialsInvalid,
+    resetError,
+    isSubmitting,
+    handleSubmit,
+  } = useForm({
+    initialValues,
+    fields: FIELDS,
+    validate: validateExpense,
+    onSubmit: async (f) => {
+      const payload = {
+        description: f.description.trim(),
+        amount: parseFloat(f.amount),
+        date: f.date.toISOString(),
+        category: f.category,
+      };
       if (onSubmit) {
-        await onSubmit(formData);
+        await onSubmit(payload);
       } else {
-        await dispatch(addExpense(formData)).unwrap();
-        setForm(initialForm);
+        await dispatch(addExpense(payload)).unwrap();
       }
-    } catch (err) {
-      Alert.alert("Failed", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [dispatch, form, onSubmit]);
-
-  if (isSubmitting) {
-    return <LoadingOverlay />;
-  }
+    },
+  });
 
   return (
-    <FormContainer>
+    <FormShell
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit}
+      onCancel={onCancel}
+      submitLabel={submitLabel}
+    >
       <Input
         label="Deskripsi"
         inValid={credentialsInvalid.description}
@@ -107,7 +80,6 @@ export default function ExpenseForm({
           onChangeText: (text) => handleChange("description", text),
         }}
       />
-
       <InputMoney
         value={form.amount}
         onChangeValue={(raw) => {
@@ -116,24 +88,20 @@ export default function ExpenseForm({
         }}
         inValid={credentialsInvalid.amount}
       />
-
       <InputDate
         date={form.date}
         onDateChange={(date) => setForm((prev) => ({ ...prev, date }))}
       />
-
       <InputCategory
         label="KATEGORI"
         categories={CATEGORIES}
         selected={form.category}
-        onSelect={handleCategorySelect}
+        onSelect={(cat) => {
+          setForm((prev) => ({ ...prev, category: cat }));
+          resetError("category");
+        }}
         inValid={credentialsInvalid.category}
       />
-
-      <TextButton onPress={handleSubmit} primary>
-        {submitLabel}
-      </TextButton>
-      {onCancel && <TextButton onPress={onCancel}>Cancel</TextButton>}
-    </FormContainer>
+    </FormShell>
   );
 }
