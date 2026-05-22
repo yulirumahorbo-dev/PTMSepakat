@@ -1,25 +1,9 @@
-import { useCallback, useState } from "react";
-import {
-  Alert,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Alert, Pressable, StyleSheet, Text } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { useDispatch, useSelector } from "react-redux";
-import {
-  Divider,
-  FormContainer,
-  Input,
-  InputCategory,
-  LoadingOverlay,
-  ScreenLayout,
-  TextButton,
-} from "../../components";
+import { useDispatch } from "react-redux";
+import { Divider, FormShell, Input, InputCategory } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
-import useFormValidation from "../../hooks/useFormValidation";
+import useForm from "../../hooks/useForm";
 import { supabase } from "../../lib/supabase";
 import { addMember } from "../../store/slices/membershipSlice";
 import {
@@ -33,6 +17,7 @@ const FIELDS = [
   "wifeName",
   "wifeRole",
   "address",
+  "family_id",
 ];
 
 const JABATAN = ["Ketua", "Sekretaris", "Bendahara", "Anggota"];
@@ -42,56 +27,40 @@ const initialForm = {
   wifeName: "",
   wifeRole: "",
   address: "",
+  family_id: null,
 };
 
-const existingNumbers = ["LBP-2025-0001-01", "LBP-2025-0002-01"];
+function validateMember(form) {
+  const errors = [];
+  if (!form.husbandName.trim()) errors.push("husbandName");
+  if (!form.husbandRole) errors.push("husbandRole");
+  if (!form.wifeName.trim()) errors.push("wifeName");
+  if (!form.wifeRole) errors.push("wifeRole");
+  if (!form.address) errors.push("address");
+  return errors;
+}
 
 export default function Store({
-  navigation,
-  initialValue = initialForm,
+  initialValues = initialForm,
+  submitLabel = "+ Add Member",
+  onCancel,
   onSubmit,
 }) {
   const dispatch = useDispatch();
-  const [form, setForm] = useState(initialValue);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { credentialsInvalid, resetError, setError } =
-    useFormValidation(FIELDS);
-  const [result, setResult] = useState(null);
 
-  function handleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    if (value.trim()) resetError(field);
-  }
-
-  function handleRoleChange(field, value) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-    resetError(field);
-  }
-
-  function validateForm() {
-    const fields = [
-      { key: "husbandName", value: form.husbandName.trim() },
-      { key: "husbandRole", value: form.husbandRole },
-      { key: "wifeName", value: form.wifeName.trim() },
-      { key: "wifeRole", value: form.wifeRole },
-      { key: "address", value: form.address.trim() },
-    ];
-
-    const invalidFields = fields.filter(({ value }) => !value);
-    invalidFields.forEach(({ key }) => setError(key));
-
-    return invalidFields.length === 0;
-  }
-
-  const handleSubmit = useCallback(async () => {
-    if (!validateForm()) {
-      Alert.alert("Incomplete", "Please fill in all fields correctly.");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-
+  const {
+    form,
+    setForm,
+    handleChange,
+    credentialsInvalid,
+    resetError,
+    isSubmitting,
+    handleSubmit,
+  } = useForm({
+    initialValues,
+    fields: FIELDS,
+    validate: validateMember,
+    onSubmit: async (f) => {
       const { data: seqData, error: seqError } = await supabase.rpc(
         "get_next_family_sequence",
       );
@@ -132,134 +101,119 @@ export default function Store({
 
       if (membersError) throw membersError.message;
 
-      setResult({
+      const payload = {
         familyId: familyNumber,
         husband: `${form.husbandName} (${husbandNumber})`,
         wife: `${form.wifeName} (${wifeNumber})`,
-      });
+      };
 
-      if (onSubmit) {
-        await onSubmit({ familyNumber, husbandNumber, wifeNumber });
-      } else {
-        dispatch(
-          addMember({ familyNumber, husbandNumber, wifeNumber, ...form }),
-        );
-        setForm(initialForm);
+      try {
+        if (onSubmit) {
+          await onSubmit(payload);
+        } else {
+          await dispatch(addMember(payload));
+        }
+      } catch (error) {
+        Alert.alert("Error", "Gagal menambahkan member. Coba lagi.");
       }
-    } catch (err) {
-      Alert.alert("Failed", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [dispatch, form, onSubmit]);
-
-  if (isSubmitting) {
-    return <LoadingOverlay />;
-  }
-
-  const debug = useSelector((state) => state); // log entire store
-  console.log("STORE:", JSON.stringify(debug));
+    },
+  });
 
   return (
-    <ScreenLayout backgroundColor={GlobalStyles.color.BG} headerShown>
-      <ScrollView>
-        <FormContainer>
-          <Pressable
-            onPress={() => setForm(initialForm)}
-            style={({ pressed }) => [
-              {
-                alignSelf: "flex-end",
-                opacity: pressed ? 0.75 : 1,
-              },
-            ]}
-          >
-            <Text style={styles.deleteButtton}>Hapus</Text>
-          </Pressable>
+    <FormShell
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit}
+      onCancel={onCancel}
+      submitLabel={submitLabel}
+    >
+      <Pressable
+        onPress={() => setForm(initialForm)}
+        style={({ pressed }) => [
+          {
+            alignSelf: "flex-end",
+            opacity: pressed ? 0.75 : 1,
+          },
+        ]}
+      >
+        <Text style={styles.deleteButtton}>Hapus</Text>
+      </Pressable>
 
-          <Text
-            style={{
-              fontSize: moderateScale(18),
-              fontWeight: "bold",
-              letterSpacing: scale(1),
-            }}
-          >
-            SUAMI
-          </Text>
-          <Input
-            label="Nama"
-            textInputConfig={{
-              placeholder: "Contoh: Alexander Silalahi",
-              keyboardType: "default",
-              value: form.husbandName,
-              onChangeText: (text) => handleChange("husbandName", text),
-            }}
-            inValid={credentialsInvalid.husbandName}
-          />
+      <Text
+        style={{
+          fontSize: moderateScale(18),
+          fontWeight: "bold",
+          letterSpacing: scale(1),
+        }}
+      >
+        SUAMI
+      </Text>
+      <Input
+        label="Nama"
+        textInputConfig={{
+          placeholder: "Contoh: Alexander Silalahi",
+          keyboardType: "default",
+          value: form.husbandName,
+          onChangeText: (text) => handleChange("husbandName", text),
+        }}
+        inValid={credentialsInvalid.husbandName}
+      />
 
-          <InputCategory
-            label="JABATAN"
-            categories={JABATAN}
-            selected={form.husbandRole}
-            onSelect={(text) => handleRoleChange("husbandRole", text)}
-            inValid={credentialsInvalid.husbandRole}
-          />
+      <InputCategory
+        label="JABATAN"
+        categories={JABATAN}
+        selected={form.husbandRole}
+        onSelect={(cat) => {
+          setForm((prev) => ({ ...prev, husbandRole: cat }));
+          resetError("husbandRole");
+        }}
+        inValid={credentialsInvalid.husbandRole}
+      />
 
-          <Divider />
-          <Text
-            style={{
-              fontSize: moderateScale(18),
-              fontWeight: "bold",
-              letterSpacing: scale(1),
-            }}
-          >
-            ISTRI
-          </Text>
-          <Input
-            label="Nama"
-            textInputConfig={{
-              placeholder: "Contoh: Bene Sinaga",
-              keyboardType: "default",
-              value: form.wifeName,
-              onChangeText: (text) => handleChange("wifeName", text),
-            }}
-            inValid={credentialsInvalid.wifeName}
-          />
+      <Divider />
+      <Text
+        style={{
+          fontSize: moderateScale(18),
+          fontWeight: "bold",
+          letterSpacing: scale(1),
+        }}
+      >
+        ISTRI
+      </Text>
+      <Input
+        label="Nama"
+        textInputConfig={{
+          placeholder: "Contoh: Bene Sinaga",
+          keyboardType: "default",
+          value: form.wifeName,
+          onChangeText: (text) => handleChange("wifeName", text),
+        }}
+        inValid={credentialsInvalid.wifeName}
+      />
 
-          <InputCategory
-            label="JABATAN"
-            categories={JABATAN}
-            selected={form.wifeRole}
-            onSelect={(text) => handleRoleChange("wifeRole", text)}
-            inValid={credentialsInvalid.wifeRole}
-          />
+      <InputCategory
+        label="JABATAN"
+        categories={JABATAN}
+        selected={form.wifeRole}
+        onSelect={(cat) => {
+          setForm((prev) => ({ ...prev, wifeRole: cat }));
+          resetError("wifeRole");
+        }}
+        inValid={credentialsInvalid.wifeRole}
+      />
 
-          <Divider />
+      <Divider />
 
-          <Input
-            label="Alamat Rumah"
-            textInputConfig={{
-              placeholder: "Jalan K H Agus Salim",
-              keyboardType: "default",
-              value: form.address,
-              onChangeText: (text) => handleChange("address", text),
-            }}
-            inValid={credentialsInvalid.address}
-          />
-
-          <TextButton primary onPress={handleSubmit}>
-            Input Data
-          </TextButton>
-        </FormContainer>
-
-        {result && (
-          <View>
-            <Text>Family ID : {result.familyId}</Text>
-            <Text>Husband : {result.husband}</Text>
-            <Text>Wife : {result.wife}</Text>
-          </View>
-        )}
-      </ScrollView>
-    </ScreenLayout>
+      <Input
+        label="Alamat Rumah"
+        textInputConfig={{
+          placeholder: "Jalan K H Agus Salim",
+          keyboardType: "default",
+          value: form.address,
+          onChangeText: (text) => handleChange("address", text),
+        }}
+        inValid={credentialsInvalid.address}
+      />
+    </FormShell>
   );
 }
 
