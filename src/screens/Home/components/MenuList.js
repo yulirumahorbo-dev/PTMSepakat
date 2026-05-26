@@ -7,9 +7,9 @@ export default function MenuList() {
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
       <MenuIcon
-        onPress={() => navigation.navigate("Pemasukan")}
+        onPress={() => navigation.navigate("Kutipan")}
         iconName="cash-plus"
-        label="PEMASUKAN"
+        label="KUTIPAN"
         color="green"
       />
       <MenuIcon

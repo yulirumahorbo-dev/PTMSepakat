@@ -1,7 +1,13 @@
 import { formatInputDisplay, parseIDR } from "../../utils/rupiah";
 import Input from "./Input";
 
-export default function InputMoney({ value, inValid, onChangeValue, ...rest }) {
+export default function InputMoney({
+  label,
+  value,
+  inValid,
+  onChangeValue,
+  ...rest
+}) {
   const handleChange = (text) => {
     const raw = parseIDR(text).replace(/\D/g, "");
     const formatted = formatInputDisplay(raw);
@@ -11,7 +17,7 @@ export default function InputMoney({ value, inValid, onChangeValue, ...rest }) {
 
   return (
     <Input
-      label="Jumlah Uang"
+      label={label}
       prefix="Rp"
       textInputConfig={{
         placeholder: "0",

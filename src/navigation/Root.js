@@ -3,7 +3,7 @@ import {
   Home,
   Kalkulator,
   Kas,
-  Pemasukan,
+  Kutipan,
   Pengeluaran,
   Pinjaman,
   Store,
@@ -17,7 +17,7 @@ export default function Root() {
     <Stack.Navigator>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Kas" component={Kas} />
-      <Stack.Screen name="Pemasukan" component={Pemasukan} />
+      <Stack.Screen name="Kutipan" component={Kutipan} />
       <Stack.Screen
         name="Pengeluaran"
         component={Pengeluaran}
