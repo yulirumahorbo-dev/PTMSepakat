@@ -78,6 +78,7 @@ export default function Store({
           family_membership_number: familyNumber,
           address: form.address.trim(),
           sequence_number: seqData,
+          name: `${form.husbandName.trim()} / ${form.wifeName.trim()}`,
         })
         .select()
         .single();
@@ -103,6 +104,7 @@ export default function Store({
 
       const payload = {
         familyId: familyNumber,
+        name: `${form.husbandName.trim()} / ${form.wifeName.trim()}`,
         husband: `${form.husbandName} (${husbandNumber})`,
         wife: `${form.wifeName} (${wifeNumber})`,
       };
