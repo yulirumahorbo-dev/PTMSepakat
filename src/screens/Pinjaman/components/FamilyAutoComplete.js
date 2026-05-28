@@ -11,12 +11,12 @@ import { moderateScale, verticalScale } from "react-native-size-matters";
 import { Input } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
 
-export default function MemberAutocomplete({
+export default function FamilyAutocomplete({
   value,
   onChangeText,
   onSelect,
   inValid,
-  members = [],
+  families = [],
 }) {
   const [suggestions, setSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -26,14 +26,14 @@ export default function MemberAutocomplete({
     if (isSelectingRef.current) return;
 
     const filtered = value.trim()
-      ? members.filter((m) =>
+      ? families.filter((m) =>
           m.name.toLowerCase().includes(value.toLowerCase()),
         )
       : [];
 
     setSuggestions(filtered);
     setShowDropdown(filtered.length > 0);
-  }, [value, members]);
+  }, [value, families]);
 
   function handleSelect(member) {
     isSelectingRef.current = true;
@@ -80,7 +80,6 @@ export default function MemberAutocomplete({
                 ]}
               >
                 <Text style={styles.suggestionName}>{item.name}</Text>
-                <Text style={styles.suggestionRole}>{item.role}</Text>
               </Pressable>
             )}
             ItemSeparatorComponent={() => <View style={styles.separator} />}

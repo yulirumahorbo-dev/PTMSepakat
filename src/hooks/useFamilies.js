@@ -5,10 +5,9 @@ import {
   selectFamilyError,
   selectFamilyStatus,
 } from "../store/selectors/familiesSelectors";
-import { fetchMembers } from "../store/slices/membershipSlice";
 import { fetchFamilies } from "../store/slices/familiesSlice";
 
-export default function useMembers() {
+export default function useFamilies() {
   const dispatch = useDispatch();
   const families = useSelector(selectAllFamilies);
   const status = useSelector(selectFamilyStatus);

@@ -3,11 +3,11 @@ import { moderateScale, verticalScale } from "react-native-size-matters";
 import { useDispatch } from "react-redux";
 import { FormShell, Input, InputDate, InputMoney } from "../../../components";
 import { GlobalStyles } from "../../../constants/styles";
+import useFamilies from "../../../hooks/useFamilies";
 import useForm from "../../../hooks/useForm";
 import useLoans from "../../../hooks/useLoans";
-import useMembers from "../../../hooks/useMembers";
 import { addLoan } from "../../../store/slices/loansSlice";
-import MemberAutocomplete from "./MemberAutoComplete";
+import FamilyAutocomplete from "./FamilyAutoComplete";
 
 const today = new Date();
 const FIELDS = ["name", "date", "totalMoney", "totalMonth", "family_id"];
@@ -28,6 +28,7 @@ function validateLoan(form) {
     error.push("totalMonth");
   return error;
 }
+
 export default function LoanForm({
   initialValues = initialForm,
   submitLabel = "+ Add Loan",
@@ -35,7 +36,7 @@ export default function LoanForm({
   onSubmit,
 }) {
   const dispatch = useDispatch();
-  const { members } = useMembers();
+  const { families } = useFamilies();
   const { loans } = useLoans();
 
   const {
@@ -91,15 +92,13 @@ export default function LoanForm({
     },
   });
 
-  function handleMemberSelect(member) {
-    const alreadyHasLoan = loans.some(
-      (loan) => loan.family_id === member.family_id,
-    );
+  function handleFamilySelect(family) {
+    const alreadyHasLoan = loans.some((loan) => loan.family_id === family.id);
 
     if (alreadyHasLoan) {
       Alert.alert(
         "Pinjaman Aktif",
-        `${member.name} masih memiliki pinjaman aktif. Selesaikan pinjaman sebelumnya terlebih dahulu.`,
+        `${family.name} masih memiliki pinjaman aktif. Selesaikan pinjaman sebelumnya terlebih dahulu.`,
         [{ text: "OK" }],
       );
       return;
@@ -107,8 +106,8 @@ export default function LoanForm({
 
     setForm((prev) => ({
       ...prev,
-      name: member.name,
-      family_id: member.family_id,
+      name: family.name,
+      family_id: family.id,
     }));
   }
 
@@ -120,7 +119,6 @@ export default function LoanForm({
       submitLabel={submitLabel}
     >
       <Pressable
-        // onPress={handleClear}
         style={({ pressed }) => [
           {
             alignSelf: "flex-end",
@@ -131,12 +129,12 @@ export default function LoanForm({
         <Text style={styles.deleteButtton}>Hapus</Text>
       </Pressable>
 
-      <MemberAutocomplete
+      <FamilyAutocomplete
         value={form.name}
-        members={members}
+        families={families} //
         onChangeText={(text) => handleChange("name", text)}
         inValid={credentialsInvalid.name}
-        onSelect={handleMemberSelect}
+        onSelect={handleFamilySelect}
       />
 
       <InputDate
@@ -167,6 +165,7 @@ export default function LoanForm({
     </FormShell>
   );
 }
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: GlobalStyles.color.CARD,
