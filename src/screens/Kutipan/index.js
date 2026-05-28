@@ -1,11 +1,22 @@
 import { useState } from "react";
-import { Modal, StyleSheet } from "react-native";
+import {
+  Modal,
+  StyleSheet,
+  View,
+  Text,
+  FlatList,
+  Pressable,
+} from "react-native";
 import { scale } from "react-native-size-matters";
 import { ScreenLayout, TextButton } from "../../components";
 import KutipanForm from "./components/KutipanForm";
+import useContributions from "../../hooks/useContributions";
+import ContributionsList from "./components/ContributionsList";
 
 export default function Kutipan({ onSuccess }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const { contributions } = useContributions();
+
   return (
     <ScreenLayout
       backgroundColor="white"
@@ -15,6 +26,8 @@ export default function Kutipan({ onSuccess }) {
       <TextButton onPress={() => setModalVisible(true)} primary>
         + Kutipan Baru
       </TextButton>
+
+      <ContributionsList contributions={contributions} />
 
       <Modal
         visible={modalVisible}
