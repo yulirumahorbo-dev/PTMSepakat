@@ -5,8 +5,8 @@ import { formatRupiah } from "../../../utils/rupiah";
 
 export default function MonthlyPayment({ monthlyPayment }) {
   return (
-    <View style={styles.interestContainer}>
-      <View style={styles.interestRow}>
+    <View style={styles.container}>
+      <View style={styles.row}>
         <Text style={styles.totalLabel}>Cicilan / Bulan</Text>
         <Text style={styles.totalValue}>{formatRupiah(monthlyPayment)}</Text>
       </View>
@@ -15,15 +15,16 @@ export default function MonthlyPayment({ monthlyPayment }) {
 }
 
 const styles = StyleSheet.create({
-  interestContainer: {
+  container: {
     backgroundColor: GlobalStyles.color.CARD,
     borderRadius: moderateScale(12),
     padding: moderateScale(12),
     borderWidth: 1,
     borderColor: GlobalStyles.color.BORDER,
     gap: verticalScale(6),
+    marginBottom: verticalScale(8),
   },
-  interestRow: {
+  row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
