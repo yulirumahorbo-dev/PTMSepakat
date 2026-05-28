@@ -4,6 +4,7 @@ import inputReducer from "./slices/inputSlice";
 import loansReducer from "./slices/loansSlice";
 import membersReducer from "./slices/membershipSlice";
 import contributionsReducer from "./slices/contributionsSlice";
+import familiesReducer from "./slices/familiesSlice";
 
 const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ const store = configureStore({
     members: membersReducer,
     expenses: expensesReducer,
     contributions: contributionsReducer,
+    families: familiesReducer,
   },
 });
 

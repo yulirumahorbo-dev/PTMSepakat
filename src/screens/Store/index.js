@@ -4,12 +4,7 @@ import { useDispatch } from "react-redux";
 import { Divider, FormShell, Input, InputCategory } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import useForm from "../../hooks/useForm";
-import { supabase } from "../../lib/supabase";
-import { addMember } from "../../store/slices/membershipSlice";
-import {
-  generateFamilyNumber,
-  generateMemberNumber,
-} from "../../utils/membership";
+import { addFamilyWithMembers } from "../../store/slices/familiesSlice";
 
 const FIELDS = [
   "husbandName",
@@ -61,63 +56,21 @@ export default function Store({
     fields: FIELDS,
     validate: validateMember,
     onSubmit: async (f) => {
-      const { data: seqData, error: seqError } = await supabase.rpc(
-        "get_next_family_sequence",
+      const result = await dispatch(
+        addFamilyWithMembers({
+          husbandName: f.husbandName,
+          husbandRole: f.husbandRole,
+          wifeName: f.wifeName,
+          wifeRole: f.wifeRole,
+          address: f.address,
+        }),
       );
 
-      if (seqError) throw seqError.message;
-
-      const year = new Date().getFullYear();
-      const familyNumber = generateFamilyNumber(year, seqData);
-      const husbandNumber = generateMemberNumber(familyNumber, "01");
-      const wifeNumber = generateMemberNumber(familyNumber, "02");
-
-      const { data: family, error: familyError } = await supabase
-        .from("families")
-        .insert({
-          family_membership_number: familyNumber,
-          address: form.address.trim(),
-          sequence_number: seqData,
-          name: `${form.husbandName.trim()} / ${form.wifeName.trim()}`,
-        })
-        .select()
-        .single();
-
-      if (familyError) throw familyError.message;
-
-      const { error: membersError } = await supabase.from("members").insert([
-        {
-          family_id: family.id,
-          membership_number: husbandNumber,
-          name: form.husbandName.trim(),
-          role: form.husbandRole,
-        },
-        {
-          family_id: family.id,
-          membership_number: wifeNumber,
-          name: form.wifeName.trim(),
-          role: form.wifeRole,
-        },
-      ]);
-
-      if (membersError) throw membersError.message;
-
-      const payload = {
-        familyId: familyNumber,
-        name: `${form.husbandName.trim()} / ${form.wifeName.trim()}`,
-        husband: `${form.husbandName} (${husbandNumber})`,
-        wife: `${form.wifeName} (${wifeNumber})`,
-      };
-
-      try {
-        if (onSubmit) {
-          await onSubmit(payload);
-        } else {
-          await dispatch(addMember(payload));
-        }
-      } catch (error) {
+      if (addFamilyWithMembers.rejected.match(result)) {
         Alert.alert("Error", "Gagal menambahkan member. Coba lagi.");
       }
+
+      if (onSubmit) await onSubmit(result.payload);
     },
   });
 

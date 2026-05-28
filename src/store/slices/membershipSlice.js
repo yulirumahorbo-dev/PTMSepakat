@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { supabase } from "../../lib/supabase";
+import { addFamilyWithMembers } from "./familiesSlice";
 
 export const fetchMembers = createAsyncThunk(
   "members/fetchAll",
@@ -98,6 +99,10 @@ const membersSlice = createSlice({
       .addCase(fetchMembers.rejected, rejectedReducer)
 
       // Add
+      .addCase(addFamilyWithMembers.fulfilled, (state, action) => {
+        state.items.unshift(...action.payload.members);
+      })
+
       .addCase(addMember.pending, pendingReducer)
       .addCase(addMember.fulfilled, (state, action) => {
         state.status = "succeeded";
