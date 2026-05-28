@@ -1,13 +1,14 @@
 import { Alert, Pressable, StyleSheet, Text } from "react-native";
-import { moderateScale, verticalScale } from "react-native-size-matters";
+import { moderateScale } from "react-native-size-matters";
 import { useDispatch } from "react-redux";
 import { FormShell, Input, InputDate, InputMoney } from "../../../components";
-import { GlobalStyles } from "../../../constants/styles";
 import useFamilies from "../../../hooks/useFamilies";
 import useForm from "../../../hooks/useForm";
 import useLoans from "../../../hooks/useLoans";
 import { addLoan } from "../../../store/slices/loansSlice";
 import FamilyAutocomplete from "./FamilyAutoComplete";
+import Interest from "./Interest";
+import MonthlyPayment from "./MonthlyPayment";
 
 const today = new Date();
 const FIELDS = ["name", "date", "totalMoney", "totalMonth", "family_id"];
@@ -67,7 +68,7 @@ export default function LoanForm({
       const payload = {
         name: f.name.trim(),
         family_id: f.family_id,
-        totalMoney: parseFloat(f.totalMoney),
+        totalMoney: totalWithInterest,
         totalMonth: parseFloat(f.totalMonth),
         date: f.date.toISOString(),
       };
@@ -91,6 +92,12 @@ export default function LoanForm({
       }
     },
   });
+
+  const rawMoney = parseFloat(form.totalMoney) || 0;
+  const rawMonth = parseFloat(form.totalMonth) || 0;
+  const interest = rawMoney * 0.1;
+  const totalWithInterest = rawMoney * 1.1;
+  const monthlyPayment = rawMonth > 0 ? totalWithInterest / rawMonth : 0;
 
   function handleFamilySelect(family) {
     const alreadyHasLoan = loans.some((loan) => loan.family_id === family.id);
@@ -125,13 +132,14 @@ export default function LoanForm({
             opacity: pressed ? 0.75 : 1,
           },
         ]}
+        onPress={() => setForm(initialForm)}
       >
         <Text style={styles.deleteButtton}>Hapus</Text>
       </Pressable>
 
       <FamilyAutocomplete
         value={form.name}
-        families={families} //
+        families={families}
         onChangeText={(text) => handleChange("name", text)}
         inValid={credentialsInvalid.name}
         onSelect={handleFamilySelect}
@@ -143,6 +151,7 @@ export default function LoanForm({
       />
 
       <InputMoney
+        label="JUMLAH UANG"
         value={form.totalMoney}
         onChangeValue={(raw) => {
           setForm((prev) => ({ ...prev, totalMoney: raw }));
@@ -150,6 +159,10 @@ export default function LoanForm({
         }}
         inValid={credentialsInvalid.totalMoney}
       />
+
+      {rawMoney > 0 && (
+        <Interest interest={interest} totalWithInterest={totalWithInterest} />
+      )}
 
       <Input
         label="Jumlah Bulan"
@@ -162,24 +175,12 @@ export default function LoanForm({
         }}
         inValid={credentialsInvalid.totalMonth}
       />
+      {monthlyPayment > 0 && <MonthlyPayment monthlyPayment={monthlyPayment} />}
     </FormShell>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: GlobalStyles.color.CARD,
-    borderRadius: moderateScale(20),
-    padding: moderateScale(20),
-    marginBottom: verticalScale(16),
-    borderWidth: moderateScale(1),
-    borderColor: GlobalStyles.color.BORDER,
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: moderateScale(4) },
-    elevation: 3,
-  },
   deleteButtton: {
     fontSize: moderateScale(18),
     color: "#df1111",

@@ -6,11 +6,7 @@ import LoanForm from "./components/LoanForm";
 
 export default function Pinjaman() {
   return (
-    <ScreenLayout
-      backgroundColor={GlobalStyles.color.BG}
-      paddingHorizontal={scale(16)}
-      headerShown
-    >
+    <ScreenLayout backgroundColor={GlobalStyles.color.BG} headerShown>
       <LoanForm />
     </ScreenLayout>
   );
