@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { GlobalStyles } from "../constants/styles";
 import {
   Home,
   Kalkulator,
@@ -8,14 +9,17 @@ import {
   Pinjaman,
   Store,
 } from "../screens";
-import { GlobalStyles } from "../constants/styles";
 
 const Stack = createNativeStackNavigator();
 
 export default function Root() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="Kas" component={Kas} />
       <Stack.Screen name="Kutipan" component={Kutipan} />
       <Stack.Screen
