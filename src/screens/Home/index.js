@@ -1,8 +1,5 @@
-import { scale } from "react-native-size-matters";
-import { Highlight, ScreenLayout } from "../../components";
-import MenuList from "./components/MenuList";
-import { Pressable, Text, View } from "react-native";
-import { formatRupiah } from "../../utils/rupiah";
+import { ScreenLayout } from "../../components";
+import HomeMenu from "./components/HomeMenu";
 import KasCard from "./components/KasCard";
 
 export default function Home({ navigation }) {
@@ -10,7 +7,7 @@ export default function Home({ navigation }) {
     <ScreenLayout backgroundColor="white" headerShown>
       <KasCard />
 
-      <MenuList />
+      <HomeMenu onMenuPress={(item) => navigation.navigate(item.id)} />
     </ScreenLayout>
   );
 }
