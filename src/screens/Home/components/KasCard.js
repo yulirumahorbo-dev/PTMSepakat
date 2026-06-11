@@ -8,21 +8,21 @@ import SubKasRow from "./SubKasRow";
 export default function KasCard() {
   const navigation = useNavigation();
   return (
-    <Pressable
-      style={({ pressed }) => [
-        styles.container,
-        { opacity: pressed ? 0.75 : 1 },
-      ]}
-      onPress={() => navigation.navigate("Kas")}
-    >
-      <View style={styles.background}>
+    <View style={styles.container}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.background,
+          { opacity: pressed ? 0.75 : 1 },
+        ]}
+        onPress={() => navigation.navigate("Kas")}
+      >
         <View style={styles.totalCard}>
           <Text style={styles.label}>Total Kas</Text>
           <Text style={styles.value}>{formatRupiah(100000)}</Text>
         </View>
 
         <SubKasRow />
-      </View>
+      </Pressable>
       <Pressable
         style={({ pressed }) => [
           styles.detailButton,
@@ -31,7 +31,7 @@ export default function KasCard() {
       >
         <Text style={styles.detailText}>Lihat Detail Transaksi →</Text>
       </Pressable>
-    </Pressable>
+    </View>
   );
 }
 
@@ -40,10 +40,9 @@ const styles = StyleSheet.create({
     paddingVertical: moderateScale(8),
     paddingHorizontal: scale(16),
   },
-
   background: {
     padding: moderateScale(10),
-    backgroundColor: GlobalStyles.color.ACCENT + "15",
+    backgroundColor: GlobalStyles.color.ACCENT + "10",
     borderRadius: moderateScale(20),
   },
   totalCard: {

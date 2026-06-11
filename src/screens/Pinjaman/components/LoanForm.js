@@ -35,6 +35,7 @@ export default function LoanForm({
   submitLabel = "+ Add Loan",
   onCancel,
   onSubmit,
+  onSuccess,
 }) {
   const dispatch = useDispatch();
   const { families } = useFamilies();
@@ -78,6 +79,7 @@ export default function LoanForm({
           await onSubmit(payload);
         } else {
           await dispatch(addLoan(payload)).unwrap();
+          onSuccess?.();
         }
       } catch (error) {
         if (error?.code === "23505") {

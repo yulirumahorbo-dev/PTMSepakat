@@ -1,13 +1,45 @@
-import { StyleSheet } from "react-native";
+import { Modal, StyleSheet } from "react-native";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
-import { ScreenLayout } from "../../components";
+import { Highlight, ScreenLayout, TextButton } from "../../components";
 import { GlobalStyles } from "../../constants/styles";
 import LoanForm from "./components/LoanForm";
+import LoansList from "./components/LoansList";
+import useLoans from "../../hooks/useLoans";
+import { formatInputDisplay } from "../../utils/rupiah";
+import { useState } from "react";
 
 export default function Pinjaman() {
+  const [modalVisible, setModalVisible] = useState(false);
+  const { loans, total } = useLoans();
   return (
-    <ScreenLayout backgroundColor={GlobalStyles.color.BG} headerShown>
-      <LoanForm />
+    <ScreenLayout
+      backgroundColor={GlobalStyles.color.BG}
+      headerShown
+      paddingHorizontal={scale(16)}
+    >
+      <Highlight
+        label="Total Uang di Anggota"
+        value={`Rp${formatInputDisplay(`${total}`)}`}
+      />
+
+      <TextButton onPress={() => setModalVisible(true)} primary>
+        + Pinjaman Baru
+      </TextButton>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <LoanForm
+          key={String(modalVisible)}
+          onCancel={() => setModalVisible(false)}
+          onSuccess={() => setModalVisible(false)}
+        />
+      </Modal>
+
+      <LoansList loans={loans} />
     </ScreenLayout>
   );
 }

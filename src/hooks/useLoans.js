@@ -4,6 +4,7 @@ import {
   selectAllLoans,
   selectLoanError,
   selectLoanStatus,
+  selectTotalLoans,
 } from "../store/selectors/loansSelectors";
 import { fetchMembers } from "../store/slices/membershipSlice";
 import { fetchLoans } from "../store/slices/loansSlice";
@@ -11,6 +12,7 @@ import { fetchLoans } from "../store/slices/loansSlice";
 export default function useLoans() {
   const dispatch = useDispatch();
   const loans = useSelector(selectAllLoans);
+  const total = useSelector(selectTotalLoans);
   const status = useSelector(selectLoanStatus);
   const error = useSelector(selectLoanError);
 
@@ -18,5 +20,5 @@ export default function useLoans() {
     dispatch(fetchLoans());
   }, [dispatch]);
 
-  return { loans, status, error };
+  return { loans, total, status, error };
 }

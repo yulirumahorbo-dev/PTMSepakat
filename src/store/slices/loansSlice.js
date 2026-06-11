@@ -14,6 +14,7 @@ export const fetchLoans = createAsyncThunk(
 
     return response.data.map((item) => ({
       id: item.id,
+      name: item.name,
       totalMoney: item.totalMoney,
       date: item.date,
       totalMonth: item.totalMonth,
